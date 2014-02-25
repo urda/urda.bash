@@ -9,10 +9,7 @@ export GIT_PS1_SHOWDIRTYSTATE=true
 export GIT_PS1_SHOWSTASHSTATE=true
 export GIT_PS1_SHOWUNTRACKEDFILES=true
 
-# don't put duplicate lines or lines starting with space in the history.
-# See bash(1) for more options
+# History Settings
 export HISTCONTROL=ignoreboth
-
-# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
 export HISTFILESIZE=2000
 export HISTSIZE=1000
