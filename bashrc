@@ -28,6 +28,11 @@ if [ -f ~/.bash_exports ]; then
     . ~/.bash_exports
 fi
 
+# If we have a private bin, include it
+if [ -d $HOME/bin/ ]; then
+    PATH="$HOME/bin:$PATH"
+fi
+
 set_ps1() {
     # Set prompt variables
     local BBlue='\[\e[1;34m\]'
