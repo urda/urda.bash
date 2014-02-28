@@ -43,6 +43,7 @@ set_ps1() {
     local Color_Off='\[\e[0m\]'
     local Outline=$BWhite
     local TermChar='$'
+    local HrChar='─'
 
     # Determine if root
     if (( $EUID == 0 )); then
@@ -51,10 +52,43 @@ set_ps1() {
         TermChar='#'
     fi
 
+    # Let's compute current line length, since bash can't count properly with escape sequences
+    # Total = Internal Whitespace + Outline Chars + username + hostname + working directory
+    local LENGTH_WHITESPACE=2
+    local LENGTH_OUTLINE=6
+
+    local LENGTH_USERNAME=$(whoami)
+    local LENGTH_USERNAME=${#LENGTH_USERNAME}
+
+    local LENGTH_HOSTNAME=$(hostname)
+    local LENGTH_HOSTNAME=${#LENGTH_HOSTNAME}
+
+    local LENGTH_DIRECTORY=$(pwd)
+    if [[ $(pwd) == $HOME* ]]; then
+        # If we are in home, then we need to count it as ~/path/to/foo not the full path
+        local LENGTH_DIRECTORY=$(pwd)
+        local LENGTH_DIRECTORY=${LENGTH_DIRECTORY:${#HOME}}
+        local LENGTH_DIRECTORY="~$LENGTH_DIRECTORY"
+    fi
+    local LENGTH_DIRECTORY=${#LENGTH_DIRECTORY}
+
+    # Let's add everything up!
+    local PS1_LENGTH=$(($LENGTH_WHITESPACE+$LENGTH_OUTLINE+$LENGTH_USERNAME+$LENGTH_HOSTNAME+$LENGTH_DIRECTORY))
+    # And compute the final result, columns minus the free length
+    local HR_LENGTH=$(($(tput cols) - $PS1_LENGTH))
+
+    if (( $HR_LENGTH > 0 )); then
+        # If we have a value > 0 we will show the line
+        local HR=$(eval printf %.0s"$HrChar" {1.."${HR_LENGTH}"})
+    else
+        # If the available space is 0 or less, we will NOT show the line
+        local HR=""
+    fi
+
     # Configure first prompt line
     #
-    # ╔═[user@host : /current/working/directory]
-    PS1="$Outline╔═[$BGreen\u@\h$Color_Off $Outline: $BBlue\w$Outline]$Color_Off\n"
+    # ╔═[user@host : /current/working/directory]───── (...)
+    PS1="$Outline╔═[$BGreen\u@\h$Color_Off $Outline: $BBlue\w$Outline]$Outline$HR\n$Color_Off"
 
     # Screen Checks
     #
