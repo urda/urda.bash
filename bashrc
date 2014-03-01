@@ -66,7 +66,6 @@ set_ps1() {
     local LENGTH_DIRECTORY=$(pwd)
     if [[ $(pwd) == $HOME* ]]; then
         # If we are in home, then we need to count it as ~/path/to/foo not the full path
-        local LENGTH_DIRECTORY=$(pwd)
         local LENGTH_DIRECTORY=${LENGTH_DIRECTORY:${#HOME}}
         local LENGTH_DIRECTORY="~$LENGTH_DIRECTORY"
     fi
