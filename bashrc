@@ -48,8 +48,8 @@ set_ps1() {
     # Determine if root
     if (( $EUID == 0 )); then
         # We ARE root, change prompt details
-        Outline=$BRed
-        TermChar='#'
+        local Outline=$BRed
+        local TermChar='#'
     fi
 
     # Let's compute current line length, since bash can't count properly with escape sequences
