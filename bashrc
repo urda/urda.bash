@@ -60,7 +60,7 @@ set_ps1() {
     local LENGTH_USERNAME=$(whoami)
     local LENGTH_USERNAME=${#LENGTH_USERNAME}
 
-    local LENGTH_HOSTNAME=$(hostname)
+    local LENGTH_HOSTNAME=$(hostname -s)
     local LENGTH_HOSTNAME=${#LENGTH_HOSTNAME}
 
     local LENGTH_DIRECTORY=$(pwd)
