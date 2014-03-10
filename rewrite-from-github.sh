@@ -36,6 +36,8 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
 
     echo "Downloading .bash_profile ..."
     curl -s https://raw.github.com/urda/urda.bash/master/bash_profile > ~/.bash_profile
+
+    echo "All done! You'll need to re-source your ~/.bashrc file to update your shell."
 else
     echo "Aborting..."
 fi
