@@ -9,7 +9,7 @@ diff-bash() {
     fi
 }
 
-diff-bash ~/.bashrc ./bashrc
-diff-bash ~/.bash_aliases ./bash_aliases
-diff-bash ~/.bash_exports ./bash_exports
-diff-bash ~/.bash_profile ./bash_profile
+diff-bash ./bashrc ~/.bashrc
+diff-bash ./bash_aliases ~/.bash_aliases
+diff-bash ./bash_exports ~/.bash_exports
+diff-bash ./bash_profile ~/.bash_profile
