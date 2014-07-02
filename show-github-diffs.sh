@@ -10,6 +10,6 @@ diff-bash() {
 }
 
 diff-bash --label=GitHub <(curl -s https://raw.githubusercontent.com/urda/urda.bash/master/bashrc) ~/.bashrc
-#diff-bash --label=GitHub <(curl -s https://raw.githubusercontent.com/urda/urda.bash/master/bash_aliases) ~/.bash_aliases
+diff-bash --label=GitHub <(curl -s https://raw.githubusercontent.com/urda/urda.bash/master/bash_aliases) ~/.bash_aliases
 diff-bash --label=GitHub <(curl -s https://raw.githubusercontent.com/urda/urda.bash/master/bash_exports) ~/.bash_exports
 diff-bash --label=GitHub <(curl -s https://raw.githubusercontent.com/urda/urda.bash/master/bash_profile) ~/.bash_profile
