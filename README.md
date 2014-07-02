@@ -14,3 +14,12 @@ you can use the following command to download the files from the project:
 ```bash
 bash <(curl -s https://raw.githubusercontent.com/urda/urda.bash/master/bootstrap-urda.bash.sh)
 ```
+
+Comparing to your local bash
+----------------------------
+
+You can also run a quick `diff` that will compare GitHub against your local `bash` files.
+
+```bash
+bash <(curl -s https://raw.githubusercontent.com/urda/urda.bash/master/show-github-diffs.sh)
+```
