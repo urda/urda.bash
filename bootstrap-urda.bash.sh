@@ -1,23 +1,23 @@
 #!/bin/bash
 
 prompt_overwrite() {
-    local Color_Off='\e[0m'
-    local BRed='\e[1;31m'
-
-    echo -en "${BRed}"
-    echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-    echo "   WARNING: This will overwrite the following"
-    echo "            files in your home directory:"
+    echo "+-------------------------------------------------+"
+    echo "| /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\ |"
+    echo "| /!\ WARNING WARNING WARNING WARNING WARNING /!\ |"
+    echo "| /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\ |"
+    echo "|                                                 |"
+    echo "|        This will overwrite the following        |"
+    echo "|          files in your home directory:          |"
+    echo "|                                                 |"
+    echo "|       .bashrc                                   |"
+    echo "|       .bash_aliases                             |"
+    echo "|       .bash_exports                             |"
+    echo "|       .bash_profile                             |"
+    echo "|                                                 |"
+    echo "|             From [git : master] on:             |"
+    echo "|        https://github.com/urda/urda.bash        |"
+    echo "+-------------------------------------------------+"
     echo
-    echo "       .bashrc"
-    echo "       .bash_aliases"
-    echo "       .bash_exports"
-    echo "       .bash_profile"
-    echo
-    echo "   From git-master on:"
-    echo "       https://github.com/urda/urda.bash"
-    echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-    echo -e "${Color_Off}"
 }
 
 prompt_overwrite
