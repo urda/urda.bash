@@ -33,6 +33,15 @@ if [ -d $HOME/bin/ ]; then
     PATH="$HOME/bin:$PATH"
 fi
 
+# Configure Keychain
+if hash keychain 2>/dev/null; then
+    eval `keychain --clear --eval`
+else
+    echo ""
+    echo -e "    \e[93m\e[7m\e[1m ~/.bashrc WARNING:\e[0m I could not find \e[1m\e[4mkeychain\e[0m on this system"
+    echo ""
+fi
+
 set_ps1() {
     # Set prompt variables
     local BBlue='\[\e[1;34m\]'
