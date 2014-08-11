@@ -7,8 +7,7 @@ alias diff='diff -u'
 alias ll='ls -hlFs'
 
 # REALLY clear the screen
-alias nuke-clear='printf "\033c"'
-alias clear='nuke-clear'
+alias clear='printf "\033c"'
 
 # When using sudo, use alias expansion (otherwise sudo ignores your aliases)
 alias sudo='sudo '
