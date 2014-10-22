@@ -1,9 +1,5 @@
 # ~/.bash_exports
 
-# Control file name completion: ignore the following suffixes
-# "ubl:e-text" ~ For removing subl, sublime-text options (sublime only tab completes)
-export FIGNORE=ubl:e-text
-
 # Git Settings
 export GIT_PS1_SHOWDIRTYSTATE=true
 export GIT_PS1_SHOWSTASHSTATE=true
