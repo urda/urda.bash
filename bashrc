@@ -42,6 +42,12 @@ else
     echo ""
 fi
 
+# Configure virtualenv
+if [ -f /usr/local/bin/virtualenvwrapper.sh ]; then
+    export WORKON_HOME=$HOME/.virtualenvs
+    source /usr/local/bin/virtualenvwrapper.sh
+fi
+
 set_ps1() {
     # Set prompt variables
     local BBlue='\[\e[1;34m\]'
@@ -132,6 +138,16 @@ set_ps1() {
     if (( "$Hg_Branch_Length" > 0 )); then
         # We indeed do have branch info
         PS1+="$Outline╠═[${BGreen}hg$Color_Off $Outline: $BBlue$Hg_Branch$Outline]$Color_Off\n"
+    fi
+
+    # virtualenv check
+    #
+    # ╠═[virtualenv : virtualenv_name]
+    if [[ $VIRTUAL_ENV != "" ]]; then
+        # ${string##substring}
+        # Deletes longest match of $substring from front of $string.
+        local venv="${VIRTUAL_ENV##*/}"
+        PS1+="$Outline╠═[${BGreen}virtualenv${Color_Off} ${Outline}: ${BBlue}${venv}${Outline}]${Color_Off}\n"
     fi
 
     # Configure final prompt line
