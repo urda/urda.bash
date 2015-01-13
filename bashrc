@@ -13,24 +13,24 @@ shopt -s checkwinsize
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
+# If we have a private bin, include it
+if [ -d $HOME/bin/ ]; then
+    PATH="$HOME/bin:$PATH"
+fi
+
 # Load bash completions
 if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
     . /etc/bash_completion
 fi
 
-# Load alias definitions
+# Load common alias definitions
 if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi
 
-# Load export definitions
+# Load common export definitions
 if [ -f ~/.bash_exports ]; then
     . ~/.bash_exports
-fi
-
-# If we have a private bin, include it
-if [ -d $HOME/bin/ ]; then
-    PATH="$HOME/bin:$PATH"
 fi
 
 # Configure Keychain
