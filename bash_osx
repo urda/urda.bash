@@ -6,7 +6,9 @@ if [ -f $(brew --prefix)/etc/bash_completion ]; then
 fi
 
 # Setting PATH for Python 2.7
-PATH="/Library/Frameworks/Python.framework/Versions/2.7/bin:${PATH}"
+if [ -d /Library/Frameworks/Python.framework/Versions/2.7/bin ]; then
+    PATH="/Library/Frameworks/Python.framework/Versions/2.7/bin:${PATH}"
+fi
 
 ### Exports
 export CLICOLOR=YES
