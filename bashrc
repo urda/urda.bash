@@ -33,6 +33,14 @@ if [ -f ~/.bash_exports ]; then
     . ~/.bash_exports
 fi
 
+# Let's handle specific systems now
+# OSX
+if [ "$(uname)" == "Darwin" ]; then
+    if [ -f ~/.bash_osx ]; then
+        . ~/.bash_osx
+    fi
+fi
+
 # Configure Keychain
 #if hash keychain 2>/dev/null; then
 #    eval `keychain --clear --eval`

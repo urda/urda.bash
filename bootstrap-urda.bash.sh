@@ -15,6 +15,7 @@ prompt_overwrite() {
     echo "|       .bash_aliases                             |"
     echo "|       .bash_exports                             |"
     echo "|       .bash_profile                             |"
+    echo "|       .bash_osx                                 |"
     echo "|                                                 |"
     echo "|             From [git : master] on:             |"
     echo "|        https://github.com/urda/urda.bash        |"
@@ -38,6 +39,9 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
 
     echo "Downloading .bash_profile ..."
     curl -s $GITHUB_BASE_URL/bash_profile > ~/.bash_profile
+
+    echo "Downloading .bash_osx ..."
+    curl -s $GITHUB_BASE_URL/bash_osx > ~/.bash_osx
 
     echo "All done! You'll need to re-source your ~/.bashrc file to update your shell."
 else
