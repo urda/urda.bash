@@ -57,25 +57,6 @@ if [ -f /usr/local/bin/virtualenvwrapper.sh ]; then
     source $(which virtualenvwrapper.sh)
 fi
 
-### OSX stuff, needs clean up and updates
-
-# Brew Daddy
-if [ -f $(brew --prefix)/etc/bash_completion ]; then
-  . $(brew --prefix)/etc/bash_completion
-fi
-
-if [ -f /Applications/Xcode.app/Contents/Developer/usr/share/git-core/git-completion.bash ]; then
-  . /Applications/Xcode.app/Contents/Developer/usr/share/git-core/git-completion.bash
-fi
-
-if [ -f /Applications/Xcode.app/Contents/Developer/usr/share/git-core/git-prompt.sh  ]; then
-  . /Applications/Xcode.app/Contents/Developer/usr/share/git-core/git-prompt.sh
-fi
-
-# Setting PATH for Python 2.7
-PATH="/Library/Frameworks/Python.framework/Versions/2.7/bin:${PATH}"
-#export PATH
-
 set_ps1() {
     # Set prompt variables
     local BBlue='\[\e[1;34m\]'
