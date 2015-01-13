@@ -13,11 +13,6 @@ shopt -s checkwinsize
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
-# If we have a private bin, include it
-if [ -d $HOME/bin/ ]; then
-    PATH="$HOME/bin:$PATH"
-fi
-
 # Load bash completions
 if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
     . /etc/bash_completion
@@ -55,6 +50,12 @@ if [ -f /usr/local/bin/virtualenvwrapper.sh ]; then
     export WORKON_HOME=$HOME/.virtualenvs
     #source /usr/local/bin/virtualenvwrapper.sh
     source $(which virtualenvwrapper.sh)
+fi
+
+# Ok we are almost done, just add the user's bin now
+# If we have a private bin, include it at the FRONT of the path
+if [ -d $HOME/bin/ ]; then
+    PATH="$HOME/bin:$PATH"
 fi
 
 set_ps1() {
