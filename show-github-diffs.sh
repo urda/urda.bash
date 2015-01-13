@@ -15,3 +15,4 @@ diff-bash --label=GitHub <(curl -s $GITHUB_BASE_URL/bashrc) ~/.bashrc
 diff-bash --label=GitHub <(curl -s $GITHUB_BASE_URL/bash_aliases) ~/.bash_aliases
 diff-bash --label=GitHub <(curl -s $GITHUB_BASE_URL/bash_exports) ~/.bash_exports
 diff-bash --label=GitHub <(curl -s $GITHUB_BASE_URL/bash_profile) ~/.bash_profile
+diff-bash --label-GitHub <(curl -s $GITHUB_BASE_URL/bash_osx) ~/.bash_osx

@@ -18,19 +18,22 @@ if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
     . /etc/bash_completion
 fi
 
-# Load alias definitions
+# Load common alias definitions
 if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi
 
-# Load export definitions
+# Load common export definitions
 if [ -f ~/.bash_exports ]; then
     . ~/.bash_exports
 fi
 
-# If we have a private bin, include it
-if [ -d $HOME/bin/ ]; then
-    PATH="$HOME/bin:$PATH"
+# Let's handle specific systems now
+# OSX
+if [ "$(uname)" == "Darwin" ]; then
+    if [ -f ~/.bash_osx ]; then
+        . ~/.bash_osx
+    fi
 fi
 
 # Configure Keychain
@@ -45,7 +48,14 @@ fi
 # Configure virtualenv
 if [ -f /usr/local/bin/virtualenvwrapper.sh ]; then
     export WORKON_HOME=$HOME/.virtualenvs
-    source /usr/local/bin/virtualenvwrapper.sh
+    #source /usr/local/bin/virtualenvwrapper.sh
+    source $(which virtualenvwrapper.sh)
+fi
+
+# Ok we are almost done, just add the user's bin now
+# If we have a private bin, include it at the FRONT of the path
+if [ -d $HOME/bin/ ]; then
+    PATH="$HOME/bin:$PATH"
 fi
 
 set_ps1() {
