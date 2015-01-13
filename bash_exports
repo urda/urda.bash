@@ -10,10 +10,6 @@ export HISTCONTROL=ignoreboth
 export HISTFILESIZE=2000
 export HISTSIZE=1000
 
-# OS X Settings
-export LANG=C
-export LESSCHARSET=utf-8
-
 # StudioNow (Check your Ubuntu VM, might already have)
 # already in bashrc -- export WORKON_HOME=~/.virtualenvs
 export VIRTUALENVWRAPPER_PYTHON=`which python3`

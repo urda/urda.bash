@@ -7,3 +7,8 @@ fi
 
 # Setting PATH for Python 2.7
 PATH="/Library/Frameworks/Python.framework/Versions/2.7/bin:${PATH}"
+
+### Exports
+export CLICOLOR=YES
+export LANG=C
+export LESSCHARSET=utf-8
