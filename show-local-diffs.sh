@@ -1,8 +1,10 @@
 #!/bin/bash
 
 diff-bash() {
-    # If colordiff is available, use it in place of diff
-    if hash colordiff 2>/dev/null; then
+    if hash git 2>/dev/null; then
+        git diff $@
+    elif hash colordiff 2>/dev/null; then
+        # If colordiff is available, use it in place of diff
         colordiff -u $@
     else
         diff -u $@

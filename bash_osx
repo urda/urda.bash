@@ -15,3 +15,10 @@ fi
 export CLICOLOR=YES
 export LANG=C
 export LESSCHARSET=utf-8
+
+### Aliases
+
+# If git is available, use it in place of diff
+if hash git 2>/dev/null; then
+    alias diff='git diff'
+fi
