@@ -1,3 +1,4 @@
+# -*- bash -*-
 # ~/.bash_aliases
 
 # better looking diff
