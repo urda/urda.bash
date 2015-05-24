@@ -10,10 +10,3 @@ export GIT_PS1_SHOWUNTRACKEDFILES=true
 export HISTCONTROL=ignoreboth
 export HISTFILESIZE=2000
 export HISTSIZE=1000
-
-# StudioNow (Check your Ubuntu VM, might already have)
-# already in bashrc -- export WORKON_HOME=~/.virtualenvs
-export VIRTUALENVWRAPPER_PYTHON=`which python3`
-export VIRTUALENVWRAPPER_VIRTUALENV_ARGS="-p `which python3`"
-
-export PATH="$PATH:/usr/local/mysql/bin"

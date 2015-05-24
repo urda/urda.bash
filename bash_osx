@@ -16,6 +16,11 @@ export CLICOLOR=YES
 export LANG=C
 export LESSCHARSET=utf-8
 
+# StudioNow Exports
+export VIRTUALENVWRAPPER_PYTHON=`which python3`
+export VIRTUALENVWRAPPER_VIRTUALENV_ARGS="-p `which python3`"
+export PATH="$PATH:/usr/local/mysql/bin"
+
 ### Aliases
 
 # If git is available, use it in place of diff
