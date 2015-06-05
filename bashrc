@@ -50,6 +50,13 @@ if [ -d $HOME/bin/ ]; then
 fi
 
 set_ps1() {
+    # Define some box drawing hex
+    local double_horizontal=$'\xE2\x95\x90'     # ═
+    local double_down_right=$'\xE2\x95\x94'     # ╔
+    local double_vertical_right=$'\xE2\x95\xa0' # ╠
+    local double_up_and_right=$'\xE2\x95\x9A'   # ╚
+    local light_horizontal=$'\xE2\x94\x80'      # ─
+
     # Set prompt variables
     local BBlue='\[\e[1;34m\]'
     local BGreen='\[\e[1;32m\]'
@@ -59,7 +66,7 @@ set_ps1() {
     local Color_Off='\[\e[0m\]'
     local Outline=$BWhite
     local TermChar='$'
-    local HrChar='─'
+    local HrChar=${light_horizontal}
 
     # Determine if root
     if (( $EUID == 0 )); then
@@ -103,14 +110,14 @@ set_ps1() {
     # Configure first prompt line
     #
     # ╔═[user@host : /current/working/directory]───── (...)
-    PS1="$Outline╔═[$BGreen\u@\h$Color_Off $Outline: $BBlue\w$Outline]$Outline$HR\n$Color_Off"
+    PS1="$Outline${double_down_right}${double_horizontal}[$BGreen\u@\h$Color_Off $Outline: $BBlue\w$Outline]$Outline$HR\n$Color_Off"
 
     # Screen Checks
     #
     # ╠═[screen : screen_name]
     if [ -n "$STY" ]; then
         # Screen is up
-        PS1+="$Outline╠═[${BGreen}screen$Color_Off $Outline: $BBlue$STY$Outline]$Color_Off\n"
+        PS1+="$Outline${double_vertical_right}${double_horizontal}[${BGreen}screen$Color_Off $Outline: $BBlue$STY$Outline]$Color_Off\n"
     fi
 
     # VCS Checks
@@ -126,7 +133,7 @@ set_ps1() {
 
         if (( "$Git_Branch_Length" > 0 )); then
             # We indeed do have branch info
-            PS1+="$Outline╠═[${BGreen}git$Color_Off $Outline: $BBlue$Git_Branch$Outline]$Color_Off\n"
+            PS1+="$Outline${double_vertical_right}${double_horizontal}[${BGreen}git$Color_Off $Outline: $BBlue$Git_Branch$Outline]$Color_Off\n"
         fi
     fi
 
@@ -138,7 +145,7 @@ set_ps1() {
 
     if (( "$Hg_Branch_Length" > 0 )); then
         # We indeed do have branch info
-        PS1+="$Outline╠═[${BGreen}hg$Color_Off $Outline: $BBlue$Hg_Branch$Outline]$Color_Off\n"
+        PS1+="$Outline${double_vertical_right}${double_horizontal}[${BGreen}hg$Color_Off $Outline: $BBlue$Hg_Branch$Outline]$Color_Off\n"
     fi
 
     # virtualenv check
@@ -148,13 +155,13 @@ set_ps1() {
         # ${string##substring}
         # Deletes longest match of $substring from front of $string.
         local venv="${VIRTUAL_ENV##*/}"
-        PS1+="$Outline╠═[${BGreen}virtualenv${Color_Off} ${Outline}: ${BBlue}${venv}${Outline}]${Color_Off}\n"
+        PS1+="$Outline${double_vertical_right}${double_horizontal}[${BGreen}virtualenv${Color_Off} ${Outline}: ${BBlue}${venv}${Outline}]${Color_Off}\n"
     fi
 
     # Configure final prompt line
     #
     # ╚═ $
-    PS1+="$Outline╚═ $TermChar$Color_Off "
+    PS1+="$Outline${double_up_and_right}${double_horizontal} $TermChar$Color_Off "
 }
 
 # Use function for prompts

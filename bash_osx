@@ -13,8 +13,6 @@ fi
 
 ### Exports
 export CLICOLOR=YES
-export LANG=C
-export LESSCHARSET=utf-8
 
 # StudioNow Exports
 export VIRTUALENVWRAPPER_PYTHON=`which python3`
