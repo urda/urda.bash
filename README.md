@@ -1,3 +1,5 @@
+[![forthebadge](http://forthebadge.com/images/badges/no-ragrets.svg)](http://forthebadge.com)
+
 Urda's Bash Files
 ========================================================================================================================
 
