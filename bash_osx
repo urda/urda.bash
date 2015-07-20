@@ -6,6 +6,14 @@ if [ -f $(brew --prefix)/etc/bash_completion ]; then
   . $(brew --prefix)/etc/bash_completion
 fi
 
+if [ -f /usr/local/bin/python3 ]; then
+    export VIRTUALENVWRAPPER_PYTHON="/usr/local/bin/python3"
+fi
+
+if [ -f /usr/local/bin/virtualenv ]; then
+    export VIRTUALENVWRAPPER_VIRTUALENV="/usr/local/bin/virtualenv"
+fi
+
 ### Exports
 export CLICOLOR=YES
 
