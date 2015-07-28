@@ -6,12 +6,16 @@ if [ -f $(brew --prefix)/etc/bash_completion ]; then
   . $(brew --prefix)/etc/bash_completion
 fi
 
-if [ -f /usr/local/bin/python3 ]; then
-    export VIRTUALENVWRAPPER_PYTHON="/usr/local/bin/python3"
+PY3PATH="$(which python3)"
+if [[ ${PY3PATH} ]]; then
+    if [[ -z ${STY} ]]; then
+        export VIRTUALENVWRAPPER_PYTHON="${PY3PATH}"
+    fi
 fi
 
-if [ -f /usr/local/bin/virtualenv ]; then
-    export VIRTUALENVWRAPPER_VIRTUALENV="/usr/local/bin/virtualenv"
+VIRTUALENVPATH="$(which virtualenv)"
+if [[ ${VIRTUALENVPATH} ]]; then
+    export VIRTUALENVWRAPPER_VIRTUALENV="${VIRTUALENVPATH}"
 fi
 
 ### Exports
