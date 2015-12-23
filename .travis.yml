@@ -1,8 +1,10 @@
 language: bash
-sudo: required
 
-install:
-  - ./travis-install.sh
+addons:
+  apt:
+    packages:
+    - shellcheck
+
 script:
   - ./travis-build.sh
 
