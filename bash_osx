@@ -2,8 +2,8 @@
 # ~/.bash_osx
 
 # Attempt to load brew - bash completions
-if [ -f $(brew --prefix)/etc/bash_completion ]; then
-  . $(brew --prefix)/etc/bash_completion
+if [ -f "$(brew --prefix)/etc/bash_completion" ]; then
+  . "$(brew --prefix)/etc/bash_completion"
 fi
 
 PY3PATH="$(which python3)"
@@ -20,10 +20,3 @@ fi
 
 ### Exports
 export CLICOLOR=YES
-
-### Aliases
-
-# If git is available, use it in place of diff
-if hash git 2>/dev/null; then
-    alias diff='git diff'
-fi

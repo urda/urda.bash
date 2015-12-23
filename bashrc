@@ -40,12 +40,12 @@ fi
 # Configure virtualenv
 if [ -f /usr/local/bin/virtualenvwrapper.sh ]; then
     export WORKON_HOME=$HOME/.virtualenvs
-    source $(which virtualenvwrapper.sh)
+    source "$(which virtualenvwrapper.sh)"
 fi
 
 # Ok we are almost done, just add the user's bin now
 # If we have a private bin, include it at the FRONT of the path
-if [ -d $HOME/bin/ ]; then
+if [ -d "$HOME/bin/" ]; then
     PATH="$HOME/bin:$PATH"
 fi
 
@@ -69,7 +69,7 @@ set_ps1() {
     local HrChar=${light_horizontal}
 
     # Determine if root
-    if (( $EUID == 0 )); then
+    if (( EUID == 0 )); then
         # We ARE root, change prompt details
         local Outline=$BRed
         local TermChar='#'
@@ -80,13 +80,16 @@ set_ps1() {
     local LENGTH_WHITESPACE=2
     local LENGTH_OUTLINE=6
 
-    local LENGTH_USERNAME=$(whoami)
-    local LENGTH_USERNAME=${#LENGTH_USERNAME}
+    local LENGTH_USERNAME
+    LENGTH_USERNAME=$(whoami)
+    LENGTH_USERNAME=${#LENGTH_USERNAME}
 
-    local LENGTH_HOSTNAME=$(hostname -s)
-    local LENGTH_HOSTNAME=${#LENGTH_HOSTNAME}
+    local LENGTH_HOSTNAME
+    LENGTH_HOSTNAME=$(hostname -s)
+    LENGTH_HOSTNAME=${#LENGTH_HOSTNAME}
 
-    local LENGTH_DIRECTORY=$(pwd)
+    local LENGTH_DIRECTORY
+    LENGTH_DIRECTORY=$(pwd)
     if [[ $(pwd) == $HOME* ]]; then
         # If we are in home, then we need to count it as ~/path/to/foo not the full path
         local LENGTH_DIRECTORY=${LENGTH_DIRECTORY:${#HOME}}
@@ -95,16 +98,23 @@ set_ps1() {
     local LENGTH_DIRECTORY=${#LENGTH_DIRECTORY}
 
     # Let's add everything up!
-    local PS1_LENGTH=$(($LENGTH_WHITESPACE+$LENGTH_OUTLINE+$LENGTH_USERNAME+$LENGTH_HOSTNAME+$LENGTH_DIRECTORY))
+    local PS1_LENGTH=$((LENGTH_WHITESPACE+LENGTH_OUTLINE+LENGTH_USERNAME+LENGTH_HOSTNAME+LENGTH_DIRECTORY))
     # And compute the final result, columns minus the free length
-    local HR_LENGTH=$(($(tput cols) - $PS1_LENGTH))
+    local HR_LENGTH=$(($(tput cols) - PS1_LENGTH))
 
-    if (( $HR_LENGTH > 0 )); then
+    if (( HR_LENGTH > 0 )); then
         # If we have a value > 0 we will show the line
-        local HR=$(eval printf %.0s"$HrChar" {1.."${HR_LENGTH}"})
+        local HR
+        HR=""
+
+        for ((i=0; i<HR_LENGTH; i++))
+        do
+            HR+=$(eval printf %.0s"$HrChar")
+        done
     else
         # If the available space is 0 or less, we will NOT show the line
-        local HR=""
+        local HR
+        HR=""
     fi
 
     # Configure first prompt line
@@ -128,8 +138,10 @@ set_ps1() {
     # ╠═[git : branch_name]
     if type __git_ps1 > /dev/null 2>&1 ; then
         # Git is available, is this a git repo?
-        local Git_Branch=$(__git_ps1 "%s")
-        local Git_Branch_Length=${#Git_Branch}
+        local Git_Branch
+        local Git_Branch_Length
+        Git_Branch=$(__git_ps1 "%s")
+        Git_Branch_Length=${#Git_Branch}
 
         if (( "$Git_Branch_Length" > 0 )); then
             # We indeed do have branch info
@@ -140,8 +152,10 @@ set_ps1() {
     # Hg check
     #
     # ╠═[hg : branch_name]
-    local Hg_Branch=$(hg branch 2> /dev/null)
-    local Hg_Branch_Length=${#Hg_Branch}
+    local Hg_Branch
+    local Hg_Branch_Length
+    Hg_Branch=$(hg branch 2> /dev/null)
+    Hg_Branch_Length=${#Hg_Branch}
 
     if (( "$Hg_Branch_Length" > 0 )); then
         # We indeed do have branch info
