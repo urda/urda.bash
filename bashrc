@@ -29,6 +29,11 @@ if [ -f ~/.bash_exports ]; then
     . ~/.bash_exports
 fi
 
+# If we have a private bin, include it at the FRONT of the path
+if [ -d "$HOME/bin/" ]; then
+    PATH="$HOME/bin:$PATH"
+fi
+
 # Let's handle specific systems now
 # OSX
 if [ "$(uname)" == "Darwin" ]; then
@@ -50,12 +55,6 @@ fi
 
 if [ -s "$HOME/.rvm/scripts/rvm" ]; then
     source "$HOME/.rvm/scripts/rvm"
-fi
-
-# Ok we are almost done, just add the user's bin now
-# If we have a private bin, include it at the FRONT of the path
-if [ -d "$HOME/bin/" ]; then
-    PATH="$HOME/bin:$PATH"
 fi
 
 set_ps1() {
