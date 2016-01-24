@@ -43,6 +43,15 @@ if [ -f /usr/local/bin/virtualenvwrapper.sh ]; then
     source "$(which virtualenvwrapper.sh)"
 fi
 
+# RVM
+if [ -d "$HOME/.rvm/bin" ]; then
+    PATH="$PATH:$HOME/.rvm/bin"
+fi
+
+if [ -s "$HOME/.rvm/scripts/rvm" ]; then
+    source "$HOME/.rvm/scripts/rvm"
+fi
+
 # Ok we are almost done, just add the user's bin now
 # If we have a private bin, include it at the FRONT of the path
 if [ -d "$HOME/bin/" ]; then
