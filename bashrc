@@ -170,6 +170,19 @@ set_ps1() {
         PS1+="$Outline${double_vertical_right}${double_horizontal}[${BGreen}hg$Color_Off $Outline: $BBlue$Hg_Branch$Outline]$Color_Off\n"
     fi
 
+    # rvm check
+    #
+    # ╠═[rvm : rvm_prompt]
+    local rvm_prompt_data
+    local rvm_prompt_length
+    rvm_prompt_data=$(rvm-prompt 2> /dev/null)
+    rvm_prompt_length=${#rvm_prompt_data}
+
+    if (( "$rvm_prompt_length" > 0 )); then
+        # We have RVM info
+        PS1+="$Outline${double_vertical_right}${double_horizontal}[${BGreen}rvm${Color_Off} ${Outline}: ${BBlue}${rvm_prompt_data}${Outline}]${Color_Off}\n"
+    fi
+
     # virtualenv check
     #
     # ╠═[virtualenv : virtualenv_name]
