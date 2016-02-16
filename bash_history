@@ -1,3 +1,4 @@
-(╯°□°）╯︵ ┻━┻
+# -*- bash -*-
 
-You serious ?
+# (╯°□°）╯︵ ┻━┻
+# You serious ?
