@@ -6,6 +6,9 @@ if [ -f "$(brew --prefix)/etc/bash_completion" ]; then
   . "$(brew --prefix)/etc/bash_completion"
 fi
 
+# Homebrew's sbin fix
+export PATH="/usr/local/sbin:$PATH"
+
 PY3PATH="$(which python3)"
 if [[ ${PY3PATH} ]]; then
     if [[ -z ${STY} ]]; then
