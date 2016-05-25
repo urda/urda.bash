@@ -9,6 +9,9 @@ fi
 # Homebrew's sbin fix
 export PATH="/usr/local/sbin:$PATH"
 
+# Docker
+eval $(docker-machine env default)
+
 PY3PATH="$(which python3)"
 if [[ ${PY3PATH} ]]; then
     if [[ -z ${STY} ]]; then
