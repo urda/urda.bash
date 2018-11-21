@@ -1,13 +1,13 @@
 # -*- bash -*-
 # ~/.bash_osx
 
+# Homebrew's sbin fix
+export PATH="/usr/local/sbin:$PATH"
+
 # Attempt to load brew - bash completions
 if [ -f "$(brew --prefix)/etc/bash_completion" ]; then
     source "$(brew --prefix)/etc/bash_completion"
 fi
-
-# # Homebrew's sbin fix
-# export PATH="/usr/local/sbin:$PATH"
 
 # Travis completion
 if [ -f ~/.travis/travis.sh ]; then
