@@ -3,26 +3,19 @@
 
 # Attempt to load brew - bash completions
 if [ -f "$(brew --prefix)/etc/bash_completion" ]; then
-  . "$(brew --prefix)/etc/bash_completion"
+    source "$(brew --prefix)/etc/bash_completion"
 fi
 
-# Homebrew's sbin fix
-export PATH="/usr/local/sbin:$PATH"
+# # Homebrew's sbin fix
+# export PATH="/usr/local/sbin:$PATH"
 
-# Docker
-eval "$(docker-machine env default)"
-
-PY3PATH="$(which python3)"
-if [[ ${PY3PATH} ]]; then
-    if [[ -z ${STY} ]]; then
-        export VIRTUALENVWRAPPER_PYTHON="${PY3PATH}"
-    fi
+# Travis completion
+if [ -f ~/.travis/travis.sh ]; then
+    source ~/.travis/travis.sh
 fi
 
-VIRTUALENVPATH="$(which virtualenv)"
-if [[ ${VIRTUALENVPATH} ]]; then
-    export VIRTUALENVWRAPPER_VIRTUALENV="${VIRTUALENVPATH}"
-fi
+# Pyenv Bullshit
+eval "$(pyenv init -)"
 
 ### Exports
 export CLICOLOR=YES
