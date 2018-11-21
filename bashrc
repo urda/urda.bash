@@ -48,24 +48,21 @@ if [ "$(uname)" == "Darwin" ]; then
     fi
 fi
 
-# Configure virtualenv
-if [ -f "$(which virtualenvwrapper.sh)" ]; then
-    # Configure virtualenv to use python3
-    PY3PATH="$(pyenv which python3)"
-    if [[ ${PY3PATH} ]]; then
-        if [[ -z ${STY} ]]; then
-            export VIRTUALENVWRAPPER_PYTHON="${PY3PATH}"
-        fi
-    fi
-
-    # Configure the wrapper's path to the installed virtualenv
-    VIRTUALENVPATH="$(which virtualenv)"
-    if [[ ${VIRTUALENVPATH} ]]; then
-        export VIRTUALENVWRAPPER_VIRTUALENV="${VIRTUALENVPATH}"
-    fi
+# Configure pyenv
+if [ -x "$(command -v pyenv)" ]; then
+    export WORKON_HOME=${HOME}/.virtualenvs
+    export PYENV_VIRTUALENVWRAPPER_PREFER_PYVENV="true"
 
     # shellcheck source=/dev/null
-    source "$(which virtualenvwrapper.sh)"
+    source /usr/local/bin/virtualenvwrapper.sh
+
+    # Pyenv INIT time.
+    eval "$(pyenv init -)"
+    eval "$(pyenv virtualenv-init -)"
+
+    # Stop `brew doctor` from crying about pyenv shims
+    # https://github.com/pyenv/pyenv/issues/106#issuecomment-440826532
+    alias brew='env PATH=${PATH//$(pyenv root)\/shims:/} brew'
 fi
 
 set_ps1() {
