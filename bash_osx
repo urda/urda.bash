@@ -17,5 +17,3 @@ fi
 # Pyenv Bullshit
 eval "$(pyenv init -)"
 
-### Exports
-export CLICOLOR=YES

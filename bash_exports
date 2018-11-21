@@ -1,6 +1,9 @@
 # -*- bash -*-
 # ~/.bash_exports
 
+# General Settings
+export CLICOLOR=YES
+
 # Git Settings
 export GIT_PS1_SHOWDIRTYSTATE=true
 export GIT_PS1_SHOWSTASHSTATE=true
