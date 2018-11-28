@@ -3,7 +3,7 @@ language: bash
 sudo: false
 
 script:
-  - ./scripts/travis-build.sh
+  - make test
 
 notifications:
   email: false
