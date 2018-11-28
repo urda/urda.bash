@@ -10,5 +10,5 @@ you can use the following command to download the files from the project:
 **/!\ WARNING /!\\** This is a destructive operation to your `.bash*` files!
 
 ```bash
-bash <(curl -s https://raw.githubusercontent.com/urda/urda.bash/master/bootstrap-urda.bash.sh)
+bash <(curl -s https://raw.githubusercontent.com/urda/urda.bash/master/scripts/bootstrap-urda.bash.sh)
 ```
