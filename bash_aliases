@@ -7,6 +7,9 @@ alias clear='printf "\033c"'
 # better looking diff
 alias diff='diff -u'
 
+# get a UUID on demand
+alias get_uuid='python3 -c "import uuid;print(uuid.uuid4())"'
+
 # long listing format
 alias ll='ls -hlFs'
 
