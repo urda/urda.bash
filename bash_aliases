@@ -1,14 +1,14 @@
 # -*- bash -*-
 # ~/.bash_aliases
 
+# REALLY clear the screen
+alias clear='printf "\033c"'
+
 # better looking diff
 alias diff='diff -u'
 
 # long listing format
 alias ll='ls -hlFs'
-
-# REALLY clear the screen
-alias clear='printf "\033c"'
 
 # When using sudo, use alias expansion (otherwise sudo ignores your aliases)
 alias sudo='sudo '
