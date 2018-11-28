@@ -2,12 +2,12 @@
 
 diff-bash() {
     if hash git 2>/dev/null; then
-        git diff $@
+        git diff "$@"
     elif hash colordiff 2>/dev/null; then
         # If colordiff is available, use it in place of diff
-        colordiff -u $@
+        colordiff -u "$@"
     else
-        diff -u $@
+        diff -u "$@"
     fi
 }
 
