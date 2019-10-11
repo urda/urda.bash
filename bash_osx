@@ -1,6 +1,9 @@
 # -*- bash -*-
 # ~/.bash_osx
 
+# Silence notice about `zsh`.
+export BASH_SILENCE_DEPRECATION_WARNING=1
+
 # Homebrew's sbin fix
 export PATH="/usr/local/sbin:$PATH"
 
