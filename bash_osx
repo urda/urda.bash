@@ -13,3 +13,21 @@ fi
 if [ -f ~/.travis/travis.sh ]; then
     source ~/.travis/travis.sh
 fi
+
+# Ignore .DS_Store files in tab complete. See also:
+#
+# https://apple.stackexchange.com/questions/71398/
+# https://apple.stackexchange.com/a/71402/59583
+#
+export FIGNORE=$FIGNORE:DS_Store
+
+# Ignore .Trash folders
+export FIGNORE=$FIGNORE:.Trash
+
+# Tab complete symlinks. See also:
+#
+# https://superuser.com/questions/271626/
+# https://superuser.com/questions/155167/
+# https://superuser.com/a/271677/10121
+#
+bind 'set mark-symlinked-directories on'
