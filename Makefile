@@ -32,8 +32,6 @@ diffs: # Run a `diff` against your local shell files against this repo's shell f
 	@$(DIFF) $(DIFF_ARGS) ./bashrc ~/.bashrc || :
 	@echo "diff ./bash_aliases ~/.bash_aliases"
 	@$(DIFF) $(DIFF_ARGS) ./bash_aliases ~/.bash_aliases || :
-	@echo "diff ./bash_amazon ~/.bash_amazon"
-	@$(DIFF) $(DIFF_ARGS) ./bash_amazon ~/.bash_amazon || :
 	@echo "diff ./bash_exports ~/.bash_exports"
 	@$(DIFF) $(DIFF_ARGS) ./bash_exports ~/.bash_exports || :
 	@echo "diff ./bash_profile ~/.bash_profile"
