@@ -50,19 +50,33 @@ fi
 
 # Configure pyenv
 if [ -x "$(command -v pyenv)" ]; then
-    export WORKON_HOME=${HOME}/.virtualenvs
-    export PYENV_VIRTUALENVWRAPPER_PREFER_PYVENV="true"
-
-    # shellcheck source=/dev/null
-    source /usr/local/bin/virtualenvwrapper.sh
-
-    # Pyenv INIT time.
+    export PYENV_ROOT="${HOME}/.pyenv"
+    export PATH="${PYENV_ROOT}/bin:${PATH}"
+    eval "$(pyenv init --path)"
     eval "$(pyenv init -)"
     eval "$(pyenv virtualenv-init -)"
 
-    # Stop `brew doctor` from crying about pyenv shims
-    # https://github.com/pyenv/pyenv/issues/106#issuecomment-440826532
-    alias brew='env PATH=${PATH//$(pyenv root)\/shims:/} brew'
+    # v--- Custom Functions ---v
+
+    deactivate () {
+        pyenv shell --unset
+    }
+
+    lsvirtualenv () {
+        pyenv virtualenvs --skip-aliases
+    }
+
+    mkvirtualenv () {
+        pyenv virtualenv ${@}
+    }
+
+    rmvirtualenv() {
+        pyenv uninstall ${@}
+    }
+
+    workon () {
+        pyenv shell ${@}
+    }
 fi
 
 set_ps1() {
@@ -121,10 +135,10 @@ set_ps1() {
     # virtualenv check
     #
     # ╠═[virtualenv : virtualenv_name]
-    if [[ $VIRTUAL_ENV != "" ]]; then
+    local venv="${PYENV_VERSION}"
+    if [[ ${venv} != "" ]]; then
         # ${string##substring}
         # Deletes longest match of $substring from front of $string.
-        local venv="${VIRTUAL_ENV##*/}"
         PS1+="$Outline${double_vertical_right}${double_horizontal}[${BGreen}virtualenv${Color_Off} ${Outline}: ${BBlue}${venv}${Outline}]${Color_Off}\\n"
     fi
 
