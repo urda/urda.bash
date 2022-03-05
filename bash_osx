@@ -38,6 +38,7 @@ export HOMEBREW_NO_ENV_HINTS=true
 
 # Attempt to load brew - bash completions
 if [ -f "$(brew --prefix)/etc/bash_completion" ]; then
+    # shellcheck source=/dev/null
     source "$(brew --prefix)/etc/bash_completion"
 fi
 

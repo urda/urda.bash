@@ -67,15 +67,15 @@ if [ -x "$(command -v pyenv)" ]; then
     }
 
     mkvirtualenv () {
-        pyenv virtualenv ${@}
+        pyenv virtualenv "${@}"
     }
 
     rmvirtualenv() {
-        pyenv uninstall ${@}
+        pyenv uninstall "${@}"
     }
 
     workon () {
-        pyenv shell ${@}
+        pyenv shell "${@}"
     }
 fi
 
