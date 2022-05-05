@@ -1,0 +1,21 @@
+name: Testing urda.bashs
+
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+
+jobs:
+  make-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: urda.bash Testing
+        run: make test
