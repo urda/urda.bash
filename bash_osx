@@ -30,6 +30,11 @@ bind 'set mark-symlinked-directories on'
 # Homebrew Modifications and Tweaks
 ################################################################################
 
+# Address "-bash: brew: command not found" on M1 macs
+if [[ $(uname -m) == 'arm64' ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
+
 # Homebrew's sbin fix
 export PATH="/usr/local/sbin:$PATH"
 
