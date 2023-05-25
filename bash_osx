@@ -51,9 +51,9 @@ fi
 #
 # https://github.com/pyenv/pyenv/issues/106#issuecomment-440826532
 #
-if [ -x "$(command -v pyenv)" ]; then
-    alias brew='env PATH=${PATH//$(pyenv root)\/shims:/} brew'
-fi
+# if [ -x "$(command -v pyenv)" ]; then
+#     alias brew='env PATH=${PATH//$(pyenv root)\/shims:/} brew'
+# fi
 
 ################################################################################
 # macOS Aliases and Functions
