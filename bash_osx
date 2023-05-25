@@ -54,3 +54,11 @@ fi
 if [ -x "$(command -v pyenv)" ]; then
     alias brew='env PATH=${PATH//$(pyenv root)\/shims:/} brew'
 fi
+
+################################################################################
+# macOS Aliases and Functions
+################################################################################
+
+update_brew() {
+    brew update && brew upgrade && brew autoremove && brew cleanup && brew doctor;
+}
