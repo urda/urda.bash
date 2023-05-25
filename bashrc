@@ -63,7 +63,7 @@ if [ -x "$(command -v pyenv)" ]; then
     }
 
     lsvirtualenv () {
-        pyenv virtualenvs --skip-aliases
+        pyenv virtualenvs --bare --skip-aliases
     }
 
     mkvirtualenv () {
