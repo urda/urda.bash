@@ -1,5 +1,5 @@
 # -*- bash -*-
-# ~/.bash_aliases
+# ~/.bash_aliases: General Aliases
 
 # REALLY clear the screen
 alias clear='printf "\033c"'

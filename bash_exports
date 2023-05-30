@@ -1,5 +1,5 @@
 # -*- bash -*-
-# ~/.bash_exports
+# ~/.bash_exports: General Exports
 
 # General Settings
 export CLICOLOR=YES
