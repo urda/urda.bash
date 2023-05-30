@@ -60,5 +60,17 @@ fi
 ################################################################################
 
 update_brew() {
-    brew update && brew upgrade && brew autoremove && brew cleanup && brew doctor;
+    bold=$(tput bold);
+    normal=$(tput sgr0);
+    echo "${bold} > brew update${normal}" &&
+    brew update &&
+    echo "${bold} > brew upgrade${normal}" &&
+    brew upgrade &&
+    echo "${bold} > brew autoremove${normal}" &&
+    brew autoremove &&
+    echo "${bold} > brew cleanup${normal}" &&
+    brew cleanup &&
+    echo "${bold} > brew doctor${normal}" &&
+    brew doctor;
+    brew --version;
 }
