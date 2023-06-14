@@ -62,6 +62,7 @@ fi
 update_brew() {
     bold=$(tput bold);
     normal=$(tput sgr0);
+    brew --version &&
     echo "${bold} > brew update${normal}" &&
     brew update &&
     echo "${bold} > brew upgrade${normal}" &&
@@ -72,5 +73,4 @@ update_brew() {
     brew cleanup &&
     echo "${bold} > brew doctor${normal}" &&
     brew doctor;
-    brew --version;
 }
