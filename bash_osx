@@ -47,14 +47,6 @@ if [ -f "$(brew --prefix)/etc/bash_completion" ]; then
     source "$(brew --prefix)/etc/bash_completion"
 fi
 
-# Stop `brew doctor` from crying about pyenv shims
-#
-# https://github.com/pyenv/pyenv/issues/106#issuecomment-440826532
-#
-# if [ -x "$(command -v pyenv)" ]; then
-#     alias brew='env PATH=${PATH//$(pyenv root)\/shims:/} brew'
-# fi
-
 ################################################################################
 # macOS Aliases and Functions
 ################################################################################
