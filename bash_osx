@@ -47,6 +47,12 @@ if [ -f "$(brew --prefix)/etc/bash_completion" ]; then
     source "$(brew --prefix)/etc/bash_completion"
 fi
 
+# Configure NVM
+if [ -f "$(brew --prefix nvm)/nvm.sh" ]; then
+    # shellcheck source=/dev/null
+    source "$(brew --prefix nvm)/nvm.sh"
+fi
+
 ################################################################################
 # macOS Aliases and Functions
 ################################################################################
