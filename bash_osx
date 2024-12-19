@@ -53,6 +53,12 @@ if [ -f "$(brew --prefix nvm)/nvm.sh" ]; then
     source "$(brew --prefix nvm)/nvm.sh"
 fi
 
+# Configure Rust
+if [ -d "$(brew --prefix rustup)/bin" ]; then
+    RUST_BIN="$(brew --prefix rustup)/bin"
+    export PATH="$PATH:$RUST_BIN"
+fi
+
 ################################################################################
 # macOS Aliases and Functions
 ################################################################################
