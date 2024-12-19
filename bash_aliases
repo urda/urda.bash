@@ -1,4 +1,5 @@
 # -*- bash -*-
+# shellcheck shell=bash
 # ~/.bash_aliases: General Aliases
 
 # REALLY clear the screen
