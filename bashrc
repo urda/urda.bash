@@ -78,6 +78,11 @@ if [ -x "$(command -v pyenv)" ]; then
     }
 fi
 
+# Is 1Password CLI available?
+if [ -f ${HOME}/.config/op/plugins.sh ]; then
+    source ${HOME}/.config/op/plugins.sh
+fi
+
 set_ps1() {
     # Define some box drawing hex
     local double_horizontal=$'\xE2\x95\x90'     # ═
