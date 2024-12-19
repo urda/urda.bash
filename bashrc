@@ -79,8 +79,9 @@ if [ -x "$(command -v pyenv)" ]; then
 fi
 
 # Is 1Password CLI available?
-if [ -f ${HOME}/.config/op/plugins.sh ]; then
-    source ${HOME}/.config/op/plugins.sh
+if [ -f "${HOME}"/.config/op/plugins.sh ]; then
+    # shellcheck source=/dev/null
+    source "${HOME}"/.config/op/plugins.sh
 fi
 
 set_ps1() {
