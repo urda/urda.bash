@@ -26,6 +26,15 @@ help: # Show this help screen
 	awk 'BEGIN {FS = ":.*?# "}; {printf "\033[1m%-30s\033[0m %s\n", $$1, $$2}'
 
 
+.PHONY: copy
+copy: # Copy the local bash configs into your home directory (DESTRUCTIVE).
+	cp ./bashrc ~/.bashrc
+	cp ./bash_aliases ~/.bash_aliases
+	cp ./bash_exports ~/.bash_exports
+	cp ./bash_profile ~/.bash_profile
+	cp ./bash_osx ~/.bash_osx
+
+
 .PHONY: diffs
 diffs: # Run a `diff` against your local shell files against this repo's shell files.
 	@echo "diff ./bashrc ~/.bashrc"
