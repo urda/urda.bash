@@ -19,6 +19,14 @@ export FIGNORE=$FIGNORE:DS_Store
 # Ignore .Trash folders
 export FIGNORE=$FIGNORE:.Trash
 
+# Fix Pinentry
+#
+# https://gpgtools.tenderapp.com/discussions/problems/50502-how-to-avoid-pinentry-pop-up-window-when-using-terminal
+#
+GPG_TTY="$(tty)"
+export GPG_TTY
+export PINENTRY_USER_DATA="USE_CURSES=1"
+
 # Tab complete symlinks. See also:
 #
 # https://superuser.com/questions/271626/
