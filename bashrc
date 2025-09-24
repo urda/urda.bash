@@ -33,6 +33,12 @@ if [ -f ~/.bash_exports ]; then
     source ~/.bash_exports
 fi
 
+# Load any secrets
+if [ -f ~/.bash_secrets ]; then
+    # shellcheck source=/dev/null
+    source ~/.bash_secrets
+fi
+
 # If we have a private bin, include it at the FRONT of the path
 if [ -d "$HOME/bin/" ]; then
     PATH="$HOME/bin:$PATH"
