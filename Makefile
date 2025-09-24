@@ -50,26 +50,5 @@ diffs: # Run a `diff` against your local shell files against this repo's shell f
 
 
 .PHONY: test
-test: envcheck # Test and check shell scripts for issues.
+test: # Test and check shell scripts for issues.
 	$(SHELLCHECK) $(SHELLCHECK_ARGS) $(SHELLCHECK_FILES)
-
-
-#-----------------------------------------------------------
-# Internal Commands
-#-----------------------------------------------------------
-.PHONY: envcheck
-envcheck:
-ifeq ($(DIFF),)
-	$(error "Can't find 'colordiff' or 'diff' command")
-endif
-ifeq ($(SHELLCHECK),)
-	$(error "Can't find 'shellcheck' command")
-endif
-
-.PHONY: envcheck-verbose
-envcheck-verbose: envcheck
-	@echo "------------------------------------------------------------"
-	@echo "Environment:"
-	@echo "diff ......... $(DIFF)"
-	@echo "shellcheck ... $(SHELLCHECK)"
-	@echo "------------------------------------------------------------"
