@@ -1,89 +1,72 @@
 # -*- bash -*-
 # shellcheck shell=bash
-# ~/.bash_osx: macOS specific settings
+# ~/.bash_osx: macOS specific modifications and tweaks
+
+[[ $- == *i* ]] || return 0
+[[ "$(uname -s)" == "Darwin" ]] || return 0
 
 ################################################################################
-# macOS Modifications and Tweaks
+# macOS Environment Variables
 ################################################################################
 
 # Silence notice about `zsh`.
 export BASH_SILENCE_DEPRECATION_WARNING=1
-
-# Ignore .DS_Store files in tab complete. See also:
-#
-# https://apple.stackexchange.com/questions/71398/
-# https://apple.stackexchange.com/a/71402/59583
-#
-export FIGNORE=$FIGNORE:DS_Store
-
-# Ignore .Trash folders
-export FIGNORE=$FIGNORE:.Trash
-
-# Fix Pinentry
-#
-# https://gpgtools.tenderapp.com/discussions/problems/50502-how-to-avoid-pinentry-pop-up-window-when-using-terminal
-#
-GPG_TTY="$(tty)"
-export GPG_TTY
+# Enable CLI Colors
+export CLICOLOR=YES
+# Tab ignores
+export FIGNORE=${FIGNORE:+${FIGNORE}:}.DS_Store:.Trash
+# GPG Pin Entry CLI setup
 export PINENTRY_USER_DATA="USE_CURSES=1"
 
-# Tab complete symlinks. See also:
-#
-# https://superuser.com/questions/271626/
-# https://superuser.com/questions/155167/
-# https://superuser.com/a/271677/10121
-#
-bind 'set mark-symlinked-directories on'
-
 ################################################################################
-# Homebrew Modifications and Tweaks
+# Tooling
 ################################################################################
 
-# Address "-bash: brew: command not found" on M1 macs
-if [[ $(uname -m) == 'arm64' ]]; then
-    eval "$(/opt/homebrew/bin/brew shellenv)"
-fi
+# ------------------------------
+# Homebrew
+# ------------------------------
+# urda.bash supports Homebrew on Apple Silicon only.
+if [ -x /opt/homebrew/bin/brew ]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
 
-# Homebrew's sbin fix
-export PATH="/usr/local/sbin:$PATH"
+  # Hide Homebrew Env Hints
+  export HOMEBREW_NO_ENV_HINTS=true
 
-# Hide Homebrew Env Hints
-export HOMEBREW_NO_ENV_HINTS=true
+  brew_prefix="$(brew --prefix 2>/dev/null)"
+  nvm_prefix="$(brew --prefix nvm 2>/dev/null)"
 
-# Attempt to load brew - bash completions
-if [ -f "$(brew --prefix)/etc/bash_completion" ]; then
-    # shellcheck source=/dev/null
-    source "$(brew --prefix)/etc/bash_completion"
-fi
-
-# Configure NVM
-if [ -f "$(brew --prefix nvm)/nvm.sh" ]; then
-    # shellcheck source=/dev/null
-    source "$(brew --prefix nvm)/nvm.sh"
-fi
-
-# Configure Rust
-if [ -d "$(brew --prefix rustup)/bin" ]; then
-    RUST_BIN="$(brew --prefix rustup)/bin"
-    export PATH="$PATH:$RUST_BIN"
-fi
-
-################################################################################
-# macOS Aliases and Functions
-################################################################################
-
-update_brew() {
-    bold=$(tput bold);
-    normal=$(tput sgr0);
+  # Custom Homebrew updater function
+  update_brew() {
+    bold=$(tput bold 2>/dev/null || printf '')
+    normal=$(tput sgr0 2>/dev/null || printf '')
     brew --version &&
-    echo "${bold} > brew update${normal}" &&
-    brew update &&
-    echo "${bold} > brew upgrade${normal}" &&
-    brew upgrade &&
-    echo "${bold} > brew autoremove${normal}" &&
-    brew autoremove &&
-    echo "${bold} > brew cleanup${normal}" &&
-    brew cleanup &&
-    echo "${bold} > brew doctor${normal}" &&
-    brew doctor;
-}
+    echo "${bold} > brew update${normal}" && brew update &&
+    echo "${bold} > brew upgrade${normal}" && brew upgrade &&
+    echo "${bold} > brew autoremove${normal}" && brew autoremove &&
+    echo "${bold} > brew cleanup${normal}" && brew cleanup &&
+    echo "${bold} > brew doctor${normal}" && brew doctor;
+  }
+
+  # ------------------------------
+  # Homebrew extras
+  # ------------------------------
+
+  # ------------------------------
+  # NVM (via Homebrew)
+  # ------------------------------
+  if [ -n "${nvm_prefix}" ] && [ -f "${nvm_prefix}/nvm.sh" ]; then
+    # shellcheck source=/dev/null
+    source "${nvm_prefix}/nvm.sh"
+  fi
+
+  # ------------------------------
+  # Bash completions
+  # ------------------------------
+  if [ -n "${brew_prefix}" ] && [ -f "${brew_prefix}/etc/bash_completion" ]; then
+    # shellcheck source=/dev/null
+    source "${brew_prefix}/etc/bash_completion"
+  fi
+
+  unset brew_prefix
+  unset nvm_prefix
+fi

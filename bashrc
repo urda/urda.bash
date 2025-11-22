@@ -2,162 +2,254 @@
 # shellcheck shell=bash
 # ~/.bashrc: executed by bash(1) for non-login shells.
 
-# If not running interactively, don't do anything
-[ -z "$PS1" ] && return
+################################################################################
+# Base Initialization
+################################################################################
 
-# append to the history file, don't overwrite it
-shopt -s histappend
+# If not running interactively, don't do anything.
+[[ $- == *i* ]] || return 0
 
-# check the window size after each command and, if necessary,
-# update the values of LINES and COLUMNS.
-shopt -s checkwinsize
+# Set shell options - Keep LINES/COLUMNS in sync, append history
+shopt -s checkwinsize histappend
 
-# make less more friendly for non-text input files, see lesspipe(1)
-[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+# Add slash on tab through for symlinks
+bind 'set mark-symlinked-directories on' 2>/dev/null
+
+# Make less more friendly for non-text input files, see lesspipe(1)
+if lesspipe_bin=$(command -v lesspipe); then
+  eval "$(SHELL=/bin/sh "${lesspipe_bin}")"
+fi
 
 # Load bash completions
-if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
+if [[ -f /etc/bash_completion ]] && ! shopt -oq posix; then
     # shellcheck source=/dev/null
     source /etc/bash_completion
 fi
 
-# Load common alias definitions
-if [ -f ~/.bash_aliases ]; then
-    # shellcheck source=/dev/null
-    source ~/.bash_aliases
-fi
+################################################################################
+# Critical Environment Variables
+################################################################################
+
+readonly URDABASH_VERSION="1.0.0"
+readonly URDABASH_OS="$(uname -s)"
+export URDABASH_OS
+export URDABASH_VERSION
+
+export XDG_CONFIG_HOME="${HOME}/.config"
+export XDG_CACHE_HOME="${HOME}/.cache"
+export XDG_DATA_HOME="${HOME}/.local/share"
+export XDG_STATE_HOME="${HOME}/.local/state"
+
+################################################################################
+# Functions
+################################################################################
+
+# Private bins at the front, only once
+_prepend_path_once() {
+  local dir=${1}
+  [[ -d ${dir} ]] || return
+  case ":${PATH}:" in
+    # Already present
+    *":${dir}:"*) ;;
+    # Prepend once
+    *) PATH="${dir}:${PATH}" ;;
+  esac
+}
+
+_source_if_exists() {
+  # shellcheck source=/dev/null
+  [[ -n "${1}" && -r "${1}" ]] && source "${1}"
+}
+
+_urda_version_check() {
+  local interval=604800  # 7 days
+  local state_dir="${XDG_STATE_HOME:-${HOME}/.local/state}/urda.bash"
+  local stamp="${state_dir}/last_check" now last=0
+  local version_url="https://raw.githubusercontent.com/urda/urda.bash/refs/heads/master/VERSION"
+
+  now=$(date +%s)
+  if [ -f "${stamp}" ]; then
+    last=$(stat -f %m "${stamp}" 2>/dev/null || stat -c %Y "${stamp}" 2>/dev/null || echo 0)
+  fi
+  (( now - last < interval )) && return
+
+  # Update state timestamp
+  if ! mkdir -p "${state_dir}"; then
+    printf 'urda.bash update check skipped: cannot create %s\n' "${state_dir}" >&2
+    return
+  fi
+  if ! touch "${stamp}"; then
+    printf 'urda.bash update check skipped: cannot write %s\n' "${stamp}" >&2
+    return
+  fi
+
+  local remote
+  if command -v curl >/dev/null 2>&1; then
+    remote=$(curl -fs -m 2 "${version_url}" 2>/dev/null) || return
+  elif command -v wget >/dev/null 2>&1; then
+    remote=$(wget -qO- --timeout=2 --tries=1 "${version_url}" 2>/dev/null) || return
+  else
+    return
+  fi
+
+  remote=${remote//[[:space:]]/}
+  [ -z "${remote}" ] && return
+  [ "${remote}" != "${URDABASH_VERSION}" ] && \
+    printf "An urda.bash update is available: '%s' -> '%s'\n" "${URDABASH_VERSION}" "${remote}" >&2
+}
+
+################################################################################
+# Sourcing
+################################################################################
 
 # Load common export definitions
-if [ -f ~/.bash_exports ]; then
-    # shellcheck source=/dev/null
-    source ~/.bash_exports
-fi
+_source_if_exists "${HOME}/.bash_exports"
+
+# Load common alias definitions
+_source_if_exists "${HOME}/.bash_aliases"
 
 # Load any secrets
-if [ -f ~/.bash_secrets ]; then
-    # shellcheck source=/dev/null
-    source ~/.bash_secrets
-fi
-
-# If we have a private bin, include it at the FRONT of the path
-if [ -d "$HOME/bin/" ]; then
-    PATH="$HOME/bin:$PATH"
-fi
+_source_if_exists "${HOME}/.bash_secrets"
 
 # Let's handle specific systems now
-# OSX
-if [ "$(uname)" == "Darwin" ]; then
-    if [ -f ~/.bash_osx ]; then
-        # shellcheck source=/dev/null
-        . ~/.bash_osx
-    fi
-fi
+case ${URDABASH_OS} in
+  # macOS / OSX
+  Darwin)
+    _source_if_exists "${HOME}/.bash_osx"
+    ;;
+  Linux)
+    _source_if_exists "${HOME}/.bash_linux"
+    ;;
+esac
 
-# Configure pyenv
-if [ -x "$(command -v pyenv)" ]; then
-    export PYENV_ROOT="${HOME}/.pyenv"
-    export PATH="${PYENV_ROOT}/bin:${PATH}"
-    eval "$(pyenv init --path)"
-    eval "$(pyenv init -)"
+_prepend_path_once "${HOME}/.local/bin"
+_prepend_path_once "${HOME}/bin"
+
+################################################################################
+# Tooling
+################################################################################
+
+# ------------------------------
+# 1Password (op)
+# ------------------------------
+_source_if_exists "${XDG_CONFIG_HOME}/op/plugins.sh"
+
+# ------------------------------
+# pyenv
+# ------------------------------
+if command -v pyenv >/dev/null 2>&1; then
+  export PYENV_ROOT="${HOME}/.pyenv"
+
+  _prepend_path_once "${PYENV_ROOT}/bin"
+
+  eval "$(pyenv init -)"
+  if command -v pyenv-virtualenv >/dev/null 2>&1; then
     eval "$(pyenv virtualenv-init -)"
 
-    # v--- Custom Functions ---v
-
-    deactivate () {
-        pyenv shell --unset
-    }
-
-    lsvirtualenv () {
-        pyenv virtualenvs --bare --skip-aliases
-    }
-
-    mkvirtualenv () {
-        pyenv virtualenv "${@}"
-    }
-
-    rmvirtualenv() {
-        pyenv uninstall "${@}"
-    }
-
-    workon () {
-        pyenv shell "${@}"
-    }
+    lsvirtualenv () { pyenv virtualenvs --bare --skip-aliases; }
+    mkvirtualenv () { pyenv virtualenv "${@}"; }
+    rmvirtualenv () { pyenv uninstall "${@}"; }
+  fi
 fi
 
-# Is 1Password CLI available?
-if [ -f "${HOME}"/.config/op/plugins.sh ]; then
-    # shellcheck source=/dev/null
-    source "${HOME}"/.config/op/plugins.sh
-fi
+################################################################################
+# Update Check
+################################################################################
 
-set_ps1() {
-    # Define some box drawing hex
-    local double_horizontal=$'\xE2\x95\x90'     # ═
-    local double_down_right=$'\xE2\x95\x94'     # ╔
-    local double_vertical_right=$'\xE2\x95\xa0' # ╠
-    local double_up_and_right=$'\xE2\x95\x9A'   # ╚
+_urda_version_check
 
-    # Set prompt variables
-    local BBlue='\[\e[1;34m\]'
-    local BGreen='\[\e[1;32m\]'
-    local BRed='\[\e[1;31m\]'
-    local BWhite='\[\e[1;37m\]'
+################################################################################
+# Prompt Functions
+# ---
+# UTF8 References
+#
+# - $'\xE2\x95\x90' ..... '═'
+# - $'\xE2\x95\x94' ..... '╔'
+# - $'\xE2\x95\xa0' ..... '╠'
+# - $'\xE2\x95\x9A' ..... '╚'
+################################################################################
 
-    local Color_Off='\[\e[0m\]'
-    local Outline=$BWhite
-    local TermChar='$'
+# ╔═[user@host : /current/working/directory]
+_ps1_header_line() {
+  local outline=${1} green=${2} blue=${3} reset=${4}
+  printf '%s%s%s[%s\\u@\\h%s %s: %s\\w%s]%s\\n%s' \
+    "${outline}" $'\xE2\x95\x94' $'\xE2\x95\x90' "${green}" "${reset}" "${outline}" "${blue}" "${outline}" "${outline}" "${reset}"
+}
 
-    # Determine if root
-    if (( EUID == 0 )); then
-        # We ARE root, change prompt details
-        local Outline=$BRed
-        local TermChar='#'
-    fi
+# ╠═[git : branch_name]
+_ps1_git_line() {
+  type __git_ps1 >/dev/null 2>&1 || return 0
+  local branch
+  branch=$(__git_ps1 "%s") || branch=""
+  [[ -n "${branch}" ]] || return 0
+  local outline=${1} green=${2} blue=${3} reset=${4}
+  printf '%s%s%s[%sgit%s %s: %s%s%s]%s\\n' \
+    "${outline}" $'\xE2\x95\xa0' $'\xE2\x95\x90' "${green}" "${reset}" "${outline}" "${blue}" "${branch}" "${outline}" "${reset}"
+}
 
-    # Configure first prompt line
-    #
-    # ╔═[user@host : /current/working/directory]
-    PS1="$Outline${double_down_right}${double_horizontal}[$BGreen\\u@\\h$Color_Off $Outline: $BBlue\\w$Outline]$Outline\\n$Color_Off"
+# ╠═[screen : screen_name]
+_ps1_screen_line() {
+  [[ -n "${STY}" ]] || return 0
+  local outline=${1} green=${2} blue=${3} reset=${4}
+  printf '%s%s%s[%sscreen%s %s: %s%s%s]%s\\n' \
+    "${outline}" $'\xE2\x95\xa0' $'\xE2\x95\x90' "${green}" "${reset}" "${outline}" "${blue}" "${STY}" "${outline}" "${reset}"
+}
 
-    # Screen Checks
-    #
-    # ╠═[screen : screen_name]
-    if [ -n "$STY" ]; then
-        # Screen is up
-        PS1+="$Outline${double_vertical_right}${double_horizontal}[${BGreen}screen$Color_Off $Outline: $BBlue$STY$Outline]$Color_Off\\n"
-    fi
+# ╠═[virtualenv : virtualenv_name]
+_ps1_virtualenv_line() {
+  local outline=${1} green=${2} blue=${3} reset=${4} venv_path=${5}
+  [[ -n "${venv_path}" ]] || return 0
+  local venv=${venv_path##*/}  # take only the last path segment
+  printf '%s%s%s[%svirtualenv%s %s: %s%s%s]%s\\n' \
+    "${outline}" $'\xE2\x95\xa0' $'\xE2\x95\x90' "${green}" "${reset}" "${outline}" "${blue}" "${venv}" "${outline}" "${reset}"
+}
 
-    # Git check
-    #
-    # ╠═[git : branch_name]
-    if type __git_ps1 > /dev/null 2>&1 ; then
-        # Git is available, is this a git repo?
-        local Git_Branch
-        local Git_Branch_Length
-        Git_Branch=$(__git_ps1 "%s")
-        Git_Branch_Length=${#Git_Branch}
+# ╚═ $
+_ps1_footer_line() {
+  local outline=${1} term_char=${2} reset=${3}
+  printf '%s%s%s %s%s ' "${outline}" $'\xE2\x95\x9A' $'\xE2\x95\x90' "${term_char}" "${reset}"
+}
 
-        if (( "$Git_Branch_Length" > 0 )); then
-            # We indeed do have branch info
-            PS1+="$Outline${double_vertical_right}${double_horizontal}[${BGreen}git$Color_Off $Outline: $BBlue$Git_Branch$Outline]$Color_Off\\n"
-        fi
-    fi
+################################################################################
+# Prompt Setup
+################################################################################
 
-    # virtualenv check
-    #
-    # ╠═[virtualenv : virtualenv_name]
-    local venv="${PYENV_VERSION}"
-    if [[ ${venv} != "" ]]; then
-        # ${string##substring}
-        # Deletes longest match of $substring from front of $string.
-        PS1+="$Outline${double_vertical_right}${double_horizontal}[${BGreen}virtualenv${Color_Off} ${Outline}: ${BBlue}${venv}${Outline}]${Color_Off}\\n"
-    fi
+_set_ps1() {
+  # Set prompt variables
+  local BBlue='\[\e[1;34m\]'
+  local BGreen='\[\e[1;32m\]'
+  local BRed='\[\e[1;31m\]'
+  local BWhite='\[\e[1;37m\]'
 
-    # Configure final prompt line
-    #
-    # ╚═ $
-    PS1+="$Outline${double_up_and_right}${double_horizontal} $TermChar$Color_Off "
+  local Color_Off='\[\e[0m\]'
+  local Outline=$BWhite
+  local TermChar='$'
+
+  # Determine if root
+  if (( EUID == 0 )); then
+    # We ARE root, change prompt details
+    Outline=$BRed
+    TermChar='#'
+  fi
+
+  local prompt=""
+  prompt=$(
+    _ps1_header_line "${Outline}" "${BGreen}" "${BBlue}" "${Color_Off}"
+    _ps1_git_line "${Outline}" "${BGreen}" "${BBlue}" "${Color_Off}"
+    _ps1_screen_line "${Outline}" "${BGreen}" "${BBlue}" "${Color_Off}"
+    _ps1_virtualenv_line "${Outline}" "${BGreen}" "${BBlue}" "${Color_Off}" "${PYENV_VIRTUAL_ENV}"
+    _ps1_footer_line "${Outline}" "${TermChar}" "${Color_Off}"
+  )
+  PS1=${prompt}
 }
 
 # Use function for prompts
-PROMPT_COMMAND=set_ps1
+pc=${PROMPT_COMMAND%;}
+case ";${pc};" in
+  *";_set_ps1;"*)
+    PROMPT_COMMAND="${pc}"
+    ;;
+  *)
+    PROMPT_COMMAND="${pc:+${pc};}_set_ps1;"
+    ;;
+esac

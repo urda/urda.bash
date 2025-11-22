@@ -12,10 +12,12 @@ on:
 
 jobs:
   make-test:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      # https://github.com/marketplace/actions/checkout
+      - name: Checkout ⬇️
+        uses: actions/checkout@v5
 
-      - name: urda.bash Testing
+      - name: urda.bash Testing 🧪
         run: make test

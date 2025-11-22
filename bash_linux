@@ -1,0 +1,10 @@
+# -*- bash -*-
+# shellcheck shell=bash
+# ~/.bash_linux: Linux specific modifications and tweaks
+
+[[ $- == *i* ]] || return 0
+[[ "$(uname -s)" == "Linux" ]] || return 0
+
+################################################################################
+# Linux Environment Variables
+################################################################################

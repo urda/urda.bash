@@ -9,3 +9,11 @@ After you clone this repo, you can also run a quick `diff` that will compare you
 ```bash
 make diffs
 ```
+
+## Running tests
+
+This will also run a `make version-check`.
+
+```bash
+make test
+```

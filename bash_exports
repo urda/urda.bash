@@ -2,13 +2,13 @@
 # shellcheck shell=bash
 # ~/.bash_exports: General Exports
 
-# General Settings
-export CLICOLOR=YES
-
 # Git Settings
 export GIT_PS1_SHOWDIRTYSTATE=true
 export GIT_PS1_SHOWSTASHSTATE=true
 export GIT_PS1_SHOWUNTRACKEDFILES=true
+
+# GPG
+export GPG_TTY="$(tty)"
 
 # History Settings
 export HISTCONTROL=ignoreboth
