@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## 1.1.0
+
+- `bashrc`
+  - Added support for `direnv`.
+  - Unified `nvm` tooling setup. Checks for `~/.nvm/nvm.sh` first, then `brew --prefix nvm`, then gives up.
+  - Created a `_postpend_path_once` function for `PATH` operations.
+  - Added additional checks to prevent errors when resourcing bash files and `readonly` values.
+  - Added additional checks and environment variables to prevent tooling reconfiguration when resourcing bash files.
+  - Added an internal `_urdabash_info` function to show information about `urda.bash`.
+  - Added the option to add a `now` flag to `_urdabash_version_check` to allow on-demand version checks.
+- `bash_osx`
+  - `nvm` setup moved to `bashrc`.
+
 ## 1.0.0
 
 - In late 2025, `urda.bash` got a fresh coat of paint.

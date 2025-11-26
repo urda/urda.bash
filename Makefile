@@ -57,7 +57,7 @@ test: version-check # Test and check shell scripts for issues.
 .PHONY: version-check
 version-check: # Check the reported version and code version.
 	@file_ver=$$(cat VERSION); \
-	var_ver=$$(awk -F\" '/^readonly URDABASH_VERSION=/{print $$2}' bashrc); \
+	var_ver=$$(awk -F\" '/^  readonly URDABASH_VERSION=/{print $$2}' bashrc); \
 	if [ "$$file_ver" = "$$var_ver" ]; then \
 		echo "VERSION matches '$$var_ver'"; \
 		exit 0; \

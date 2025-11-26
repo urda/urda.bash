@@ -30,10 +30,20 @@ fi
 # Critical Environment Variables
 ################################################################################
 
-readonly URDABASH_VERSION="1.0.0"
-readonly URDABASH_OS="$(uname -s)"
-export URDABASH_OS
-export URDABASH_VERSION
+if [[ -z ${URDABASH_VERSION+x} ]]; then
+  readonly URDABASH_VERSION="1.1.0"
+  export URDABASH_VERSION
+fi
+
+if [[ -z ${URDABASH_VERSION_URL+x} ]]; then
+  readonly URDABASH_VERSION_URL="https://raw.githubusercontent.com/urda/urda.bash/refs/heads/master/VERSION"
+  export URDABASH_VERSION_URL
+fi
+
+if [[ -z ${URDABASH_OS+x} ]]; then
+  readonly URDABASH_OS="$(uname -s)"
+  export URDABASH_OS
+fi
 
 export XDG_CONFIG_HOME="${HOME}/.config"
 export XDG_CACHE_HOME="${HOME}/.cache"
@@ -44,7 +54,7 @@ export XDG_STATE_HOME="${HOME}/.local/state"
 # Functions
 ################################################################################
 
-# Private bins at the front, only once
+# Add to the FRONT of the PATH (unless already present).
 _prepend_path_once() {
   local dir=${1}
   [[ -d ${dir} ]] || return
@@ -56,22 +66,54 @@ _prepend_path_once() {
   esac
 }
 
+# Add to the END of the PATH (unless already present).
+_postpend_path_once() {
+  local dir=${1}
+  [[ -d ${dir} ]] || return
+  case ":${PATH}:" in
+    # Already present
+    *":${dir}:"*) ;;
+    # Postpend once
+    *) PATH="${PATH}:${dir}" ;;
+  esac
+}
+
 _source_if_exists() {
   # shellcheck source=/dev/null
   [[ -n "${1}" && -r "${1}" ]] && source "${1}"
 }
 
-_urda_version_check() {
+_urdabash_info() {
+  local direnv_status="0"
+  local nvm_status="0"
+  local pyenv_status="0"
+
+  [[ -n ${URDABASH_LOADED_DIRENV+x} ]] && direnv_status="${URDABASH_LOADED_DIRENV}"
+  [[ -n ${URDABASH_LOADED_NVM+x} ]] && nvm_status="${URDABASH_LOADED_NVM}"
+  [[ -n ${URDABASH_LOADED_PYENV+x} ]] && pyenv_status="${URDABASH_LOADED_PYENV}"
+
+  echo "URDABASH_VERSION ......... ${URDABASH_VERSION}"
+  echo "URDABASH_VERSION_URL ..... ${URDABASH_VERSION_URL}"
+  echo "URDABASH_OS .............. ${URDABASH_OS}"
+  echo "URDABASH_LOADED_DIRENV ... ${direnv_status}"
+  echo "URDABASH_LOADED_NVM ...... ${nvm_status}"
+  echo "URDABASH_LOADED_PYENV .... ${pyenv_status}"
+}
+
+_urdabash_version_check() {
   local interval=604800  # 7 days
   local state_dir="${XDG_STATE_HOME:-${HOME}/.local/state}/urda.bash"
   local stamp="${state_dir}/last_check" now last=0
-  local version_url="https://raw.githubusercontent.com/urda/urda.bash/refs/heads/master/VERSION"
+  local version_url="${URDABASH_VERSION_URL}"
+  local force_check_now=${1:-}
 
   now=$(date +%s)
   if [ -f "${stamp}" ]; then
     last=$(stat -f %m "${stamp}" 2>/dev/null || stat -c %Y "${stamp}" 2>/dev/null || echo 0)
   fi
-  (( now - last < interval )) && return
+  if [[ ${force_check_now} != now ]] && (( now - last < interval )); then
+    return
+  fi
 
   # Update state timestamp
   if ! mkdir -p "${state_dir}"; then
@@ -95,7 +137,7 @@ _urda_version_check() {
   remote=${remote//[[:space:]]/}
   [ -z "${remote}" ] && return
   [ "${remote}" != "${URDABASH_VERSION}" ] && \
-    printf "An urda.bash update is available: '%s' -> '%s'\n" "${URDABASH_VERSION}" "${remote}" >&2
+    printf "An urda.bash update is available:\nLocal version:  '%s'\nRemote version: '%s'\n" "${URDABASH_VERSION}" "${remote}" >&2
 }
 
 ################################################################################
@@ -135,9 +177,37 @@ _prepend_path_once "${HOME}/bin"
 _source_if_exists "${XDG_CONFIG_HOME}/op/plugins.sh"
 
 # ------------------------------
+# direnv
+# ------------------------------
+if command -v direnv >/dev/null 2>&1 && [[ -z ${URDABASH_LOADED_DIRENV+x} ]]; then
+  readonly URDABASH_LOADED_DIRENV=1
+  eval "$(direnv hook bash)"
+fi
+
+# ------------------------------
+# NVM (via ~/.nvm or Homebrew)
+# ------------------------------
+if [[ -z ${URDABASH_LOADED_NVM+x} ]]; then
+  readonly URDABASH_LOADED_NVM=1
+  export NVM_DIR="${HOME}/.nvm"
+  command -v brew >/dev/null 2>&1 && nvm_brew_prefix="$(brew --prefix nvm 2>/dev/null)"
+
+  if [ -s "${HOME}/.nvm/nvm.sh" ]; then
+    _source_if_exists "${NVM_DIR}/nvm.sh"
+    _source_if_exists "${NVM_DIR}/bash_completion"
+  elif [ -n "${nvm_brew_prefix}" ] && [ -f "${nvm_brew_prefix}/nvm.sh" ]; then
+    _source_if_exists "${nvm_brew_prefix}/nvm.sh"
+    _source_if_exists "${nvm_brew_prefix}/etc/bash_completion.d/nvm"
+  fi
+
+  unset nvm_brew_prefix
+fi
+
+# ------------------------------
 # pyenv
 # ------------------------------
-if command -v pyenv >/dev/null 2>&1; then
+if command -v pyenv >/dev/null 2>&1 && [[ -z ${URDABASH_LOADED_PYENV+x} ]]; then
+  readonly URDABASH_LOADED_PYENV=1
   export PYENV_ROOT="${HOME}/.pyenv"
 
   _prepend_path_once "${PYENV_ROOT}/bin"
@@ -156,7 +226,7 @@ fi
 # Update Check
 ################################################################################
 
-_urda_version_check
+_urdabash_version_check "noop"
 
 ################################################################################
 # Prompt Functions

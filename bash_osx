@@ -32,9 +32,6 @@ if [ -x /opt/homebrew/bin/brew ]; then
   # Hide Homebrew Env Hints
   export HOMEBREW_NO_ENV_HINTS=true
 
-  brew_prefix="$(brew --prefix 2>/dev/null)"
-  nvm_prefix="$(brew --prefix nvm 2>/dev/null)"
-
   # Custom Homebrew updater function
   update_brew() {
     bold=$(tput bold 2>/dev/null || printf '')
@@ -50,14 +47,7 @@ if [ -x /opt/homebrew/bin/brew ]; then
   # ------------------------------
   # Homebrew extras
   # ------------------------------
-
-  # ------------------------------
-  # NVM (via Homebrew)
-  # ------------------------------
-  if [ -n "${nvm_prefix}" ] && [ -f "${nvm_prefix}/nvm.sh" ]; then
-    # shellcheck source=/dev/null
-    source "${nvm_prefix}/nvm.sh"
-  fi
+  brew_prefix="$(brew --prefix 2>/dev/null)"
 
   # ------------------------------
   # Bash completions
@@ -68,5 +58,4 @@ if [ -x /opt/homebrew/bin/brew ]; then
   fi
 
   unset brew_prefix
-  unset nvm_prefix
 fi
