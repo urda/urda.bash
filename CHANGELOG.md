@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 1.1.1
+
+This is a bugfix release. `_urdabash_version_check` would fail on some Linux instances.
+
+- `bashrc`
+  - Fixed an issue with checking the timestamp on the state object.
+
 ## 1.1.0
 
 - `bashrc`

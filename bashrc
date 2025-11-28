@@ -31,7 +31,7 @@ fi
 ################################################################################
 
 if [[ -z ${URDABASH_VERSION+x} ]]; then
-  readonly URDABASH_VERSION="1.1.0"
+  readonly URDABASH_VERSION="1.1.1"
   export URDABASH_VERSION
 fi
 
@@ -109,7 +109,7 @@ _urdabash_version_check() {
 
   now=$(date +%s)
   if [ -f "${stamp}" ]; then
-    last=$(stat -f %m "${stamp}" 2>/dev/null || stat -c %Y "${stamp}" 2>/dev/null || echo 0)
+    last=$(stat -c %Y "${stamp}" 2>/dev/null || stat -f %m "${stamp}" 2>/dev/null || echo 0)
   fi
   if [[ ${force_check_now} != now ]] && (( now - last < interval )); then
     return
