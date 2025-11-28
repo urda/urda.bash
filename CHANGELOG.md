@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 1.1.2
+
+This is a bugfix release. `_urdabash_version_check` would incorrectly report `nvm` loaded status.
+
+- `bashrc`
+  - Only set `URDABASH_LOADED_NVM` if `nvm`.
+  - Only export `NVM_DIR` if `nvm` is actually loaded.
+
 ## 1.1.1
 
 This is a bugfix release. `_urdabash_version_check` would fail on some Linux instances.

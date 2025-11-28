@@ -31,7 +31,7 @@ fi
 ################################################################################
 
 if [[ -z ${URDABASH_VERSION+x} ]]; then
-  readonly URDABASH_VERSION="1.1.1"
+  readonly URDABASH_VERSION="1.1.2"
   export URDABASH_VERSION
 fi
 
@@ -188,16 +188,20 @@ fi
 # NVM (via ~/.nvm or Homebrew)
 # ------------------------------
 if [[ -z ${URDABASH_LOADED_NVM+x} ]]; then
-  readonly URDABASH_LOADED_NVM=1
-  export NVM_DIR="${HOME}/.nvm"
   command -v brew >/dev/null 2>&1 && nvm_brew_prefix="$(brew --prefix nvm 2>/dev/null)"
 
   if [ -s "${HOME}/.nvm/nvm.sh" ]; then
+    readonly URDABASH_LOADED_NVM=1
+    export NVM_DIR="${HOME}/.nvm"
     _source_if_exists "${NVM_DIR}/nvm.sh"
     _source_if_exists "${NVM_DIR}/bash_completion"
   elif [ -n "${nvm_brew_prefix}" ] && [ -f "${nvm_brew_prefix}/nvm.sh" ]; then
+    readonly URDABASH_LOADED_NVM=1
+    export NVM_DIR="${HOME}/.nvm"
     _source_if_exists "${nvm_brew_prefix}/nvm.sh"
     _source_if_exists "${nvm_brew_prefix}/etc/bash_completion.d/nvm"
+  else
+    readonly URDABASH_LOADED_NVM=0
   fi
 
   unset nvm_brew_prefix
