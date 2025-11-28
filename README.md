@@ -21,6 +21,21 @@ This is a collection of my bash prompt settings, aliases, exports, and other rel
 
 Should work with `bash 3.2` or higher.
 
+# `urda.bash` Special Functions
+
+These are helper functions for `urda.bash`. You should not rely on them as a public API at this time.
+
+- `_postpend_path_once`
+  - Postpends a value to the `${PATH}` variable ONCE, and avoids duplicates.
+- `_prepend_path_once`
+  - Prepends a value to the `${PATH}` variable ONCE, and avoids duplicates.
+- `_source_if_exists`
+  - Internal helper function to only `source` a file if it exists, skips otherwise.
+- `_urdabash_info`
+  - You can invoke this to see a little information printout about the current `urda.bash` configuration.
+- `_urdabash_version_check`
+  - This handles checking for a different `VERSION` (which should mean a new `urda.bash` release is out).
+
 # Working with `urda.bash` project files
 
 ## Get `Makefile` help
