@@ -6,11 +6,12 @@
 export GIT_PS1_SHOWDIRTYSTATE=true
 export GIT_PS1_SHOWSTASHSTATE=true
 export GIT_PS1_SHOWUNTRACKEDFILES=true
+export GIT_PS1_SHOWUPSTREAM=false
 
 # GPG
 export GPG_TTY="$(tty)"
 
 # History Settings
 export HISTCONTROL=ignoreboth
-export HISTFILESIZE=2000
-export HISTSIZE=1000
+export HISTFILESIZE=100000
+export HISTSIZE=50000

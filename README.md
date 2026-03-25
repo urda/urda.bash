@@ -11,12 +11,11 @@ This is a collection of my bash prompt settings, aliases, exports, and other rel
 - Displays "information lines" in shell:
   - `git` working state information.
   - `screen` session name.
-  - `virtualenv` / `pyenv` environment names.
 - Understands various tools and tooling in shell:
+  - [1Password CLI](https://developer.1password.com/docs/cli/) support.
   - [`direnv`](https://direnv.net/) support.
-  - [`nvm`](https://github.com/nvm-sh/nvm) support.
-  - [`pyenv`](https://github.com/pyenv/pyenv) support.
-- Weekly `VERSION` check against GitHub remote.
+  - [`fnm`](https://github.com/Schniz/fnm) support.
+- Weekly `VERSION` check against GitHub remote (non-blocking).
   - Also supports on-demand version checking with `_urdabash_version_check now`
 
 Should work with `bash 3.2` or higher.
@@ -25,8 +24,6 @@ Should work with `bash 3.2` or higher.
 
 These are helper functions for `urda.bash`. You should not rely on them as a public API at this time.
 
-- `_postpend_path_once`
-  - Postpends a value to the `${PATH}` variable ONCE, and avoids duplicates.
 - `_prepend_path_once`
   - Prepends a value to the `${PATH}` variable ONCE, and avoids duplicates.
 - `_source_if_exists`

@@ -6,7 +6,7 @@
 alias clear='printf "\033c"'
 
 # better looking diff
-if hash colordiff 2>/dev/null; then
+if command -v colordiff >/dev/null 2>&1; then
   alias diff='colordiff -u'
 else
   alias diff='diff -u'
@@ -16,7 +16,7 @@ fi
 alias get_uuid='python3 -c "import uuid;print(uuid.uuid4())"'
 
 # long listing format
-alias ll='ls -hlFs'
+alias ll='ls -hlF'
 
 # When using sudo, use alias expansion (otherwise sudo ignores your aliases)
 alias sudo='sudo '

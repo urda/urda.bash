@@ -15,23 +15,12 @@ shopt -s checkwinsize histappend
 # Add slash on tab through for symlinks
 bind 'set mark-symlinked-directories on' 2>/dev/null
 
-# Make less more friendly for non-text input files, see lesspipe(1)
-if lesspipe_bin=$(command -v lesspipe); then
-  eval "$(SHELL=/bin/sh "${lesspipe_bin}")"
-fi
-
-# Load bash completions
-if [[ -f /etc/bash_completion ]] && ! shopt -oq posix; then
-    # shellcheck source=/dev/null
-    source /etc/bash_completion
-fi
-
 ################################################################################
 # Critical Environment Variables
 ################################################################################
 
 if [[ -z ${URDABASH_VERSION+x} ]]; then
-  readonly URDABASH_VERSION="1.1.2"
+  readonly URDABASH_VERSION="1.2.0"
   export URDABASH_VERSION
 fi
 
@@ -66,47 +55,52 @@ _prepend_path_once() {
   esac
 }
 
-# Add to the END of the PATH (unless already present).
-_postpend_path_once() {
-  local dir=${1}
-  [[ -d ${dir} ]] || return
-  case ":${PATH}:" in
-    # Already present
-    *":${dir}:"*) ;;
-    # Postpend once
-    *) PATH="${PATH}:${dir}" ;;
-  esac
-}
-
 _source_if_exists() {
   # shellcheck source=/dev/null
   [[ -n "${1}" && -r "${1}" ]] && source "${1}"
 }
 
 _urdabash_info() {
+  local onepassword_status="0"
   local direnv_status="0"
-  local nvm_status="0"
-  local pyenv_status="0"
-
+  local fnm_status="0"
+  local homebrew_status="0"
+  [[ -n ${URDABASH_LOADED_1PASSWORD+x} ]] && onepassword_status="${URDABASH_LOADED_1PASSWORD}"
   [[ -n ${URDABASH_LOADED_DIRENV+x} ]] && direnv_status="${URDABASH_LOADED_DIRENV}"
-  [[ -n ${URDABASH_LOADED_NVM+x} ]] && nvm_status="${URDABASH_LOADED_NVM}"
-  [[ -n ${URDABASH_LOADED_PYENV+x} ]] && pyenv_status="${URDABASH_LOADED_PYENV}"
+  [[ -n ${URDABASH_LOADED_FNM+x} ]] && fnm_status="${URDABASH_LOADED_FNM}"
+  [[ -n ${URDABASH_LOADED_HOMEBREW+x} ]] && homebrew_status="${URDABASH_LOADED_HOMEBREW}"
 
-  echo "URDABASH_VERSION ......... ${URDABASH_VERSION}"
-  echo "URDABASH_VERSION_URL ..... ${URDABASH_VERSION_URL}"
-  echo "URDABASH_OS .............. ${URDABASH_OS}"
-  echo "URDABASH_LOADED_DIRENV ... ${direnv_status}"
-  echo "URDABASH_LOADED_NVM ...... ${nvm_status}"
-  echo "URDABASH_LOADED_PYENV .... ${pyenv_status}"
+  echo "BASH_VERSION ................ ${BASH_VERSION}"
+  echo "URDABASH_VERSION ............ ${URDABASH_VERSION}"
+  echo "URDABASH_VERSION_URL ........ ${URDABASH_VERSION_URL}"
+  echo "URDABASH_OS ................. ${URDABASH_OS}"
+  echo "URDABASH_LOADED_1PASSWORD ... ${onepassword_status}"
+  echo "URDABASH_LOADED_DIRENV ...... ${direnv_status}"
+  echo "URDABASH_LOADED_FNM ......... ${fnm_status}"
+  echo "URDABASH_LOADED_HOMEBREW .... ${homebrew_status}"
 }
 
 _urdabash_version_check() {
-  local interval=604800  # 7 days
   local state_dir="${XDG_STATE_HOME:-${HOME}/.local/state}/urda.bash"
-  local stamp="${state_dir}/last_check" now last=0
+  local stamp="${state_dir}/last_check"
+  local cached="${state_dir}/remote_version"
   local version_url="${URDABASH_VERSION_URL}"
+  local interval=604800  # 7 days
   local force_check_now=${1:-}
 
+  # Check cached remote version (instant, no network)
+  if [ -f "${cached}" ]; then
+    local remote
+    remote=$(<"${cached}")
+    remote=${remote//[[:space:]]/}
+    if [ -n "${remote}" ] && [ "${remote}" != "${URDABASH_VERSION}" ]; then
+      printf "An urda.bash update is available:\nLocal version:  '%s'\nRemote version: '%s'\n" "${URDABASH_VERSION}" "${remote}" >&2
+    fi
+  fi
+
+  # Determine if a background fetch is needed
+  local now
+  local last=0
   now=$(date +%s)
   if [ -f "${stamp}" ]; then
     last=$(stat -c %Y "${stamp}" 2>/dev/null || stat -f %m "${stamp}" 2>/dev/null || echo 0)
@@ -115,29 +109,24 @@ _urdabash_version_check() {
     return
   fi
 
-  # Update state timestamp
-  if ! mkdir -p "${state_dir}"; then
-    printf 'urda.bash update check skipped: cannot create %s\n' "${state_dir}" >&2
-    return
-  fi
-  if ! touch "${stamp}"; then
-    printf 'urda.bash update check skipped: cannot write %s\n' "${stamp}" >&2
-    return
-  fi
+  # Background fetch: update timestamp and fetch remote version
+  (
+    mkdir -p "${state_dir}" || return
+    touch "${stamp}" || return
 
-  local remote
-  if command -v curl >/dev/null 2>&1; then
-    remote=$(curl -fs -m 2 "${version_url}" 2>/dev/null) || return
-  elif command -v wget >/dev/null 2>&1; then
-    remote=$(wget -qO- --timeout=2 --tries=1 "${version_url}" 2>/dev/null) || return
-  else
-    return
-  fi
+    local fetched
+    if command -v curl >/dev/null 2>&1; then
+      fetched=$(curl -fs -m 5 "${version_url}" 2>/dev/null) || return
+    elif command -v wget >/dev/null 2>&1; then
+      fetched=$(wget -qO- --timeout=5 --tries=1 "${version_url}" 2>/dev/null) || return
+    else
+      return
+    fi
 
-  remote=${remote//[[:space:]]/}
-  [ -z "${remote}" ] && return
-  [ "${remote}" != "${URDABASH_VERSION}" ] && \
-    printf "An urda.bash update is available:\nLocal version:  '%s'\nRemote version: '%s'\n" "${URDABASH_VERSION}" "${remote}" >&2
+    fetched=${fetched//[[:space:]]/}
+    [ -n "${fetched}" ] && printf '%s' "${fetched}" > "${cached}"
+  ) &
+  disown
 }
 
 ################################################################################
@@ -174,7 +163,16 @@ _prepend_path_once "${HOME}/bin"
 # ------------------------------
 # 1Password (op)
 # ------------------------------
-_source_if_exists "${XDG_CONFIG_HOME}/op/plugins.sh"
+if [[ -z ${URDABASH_LOADED_1PASSWORD+x} ]]; then
+  _op_plugins="${XDG_CONFIG_HOME}/op/plugins.sh"
+  if [[ -r "${_op_plugins}" ]]; then
+    readonly URDABASH_LOADED_1PASSWORD=1
+    _source_if_exists "${_op_plugins}"
+  else
+    readonly URDABASH_LOADED_1PASSWORD=0
+  fi
+  unset _op_plugins
+fi
 
 # ------------------------------
 # direnv
@@ -182,55 +180,25 @@ _source_if_exists "${XDG_CONFIG_HOME}/op/plugins.sh"
 if command -v direnv >/dev/null 2>&1 && [[ -z ${URDABASH_LOADED_DIRENV+x} ]]; then
   readonly URDABASH_LOADED_DIRENV=1
   eval "$(direnv hook bash)"
+else
+  readonly URDABASH_LOADED_DIRENV=0
 fi
 
 # ------------------------------
-# NVM (via ~/.nvm or Homebrew)
+# fnm (via Homebrew or standalone)
 # ------------------------------
-if [[ -z ${URDABASH_LOADED_NVM+x} ]]; then
-  command -v brew >/dev/null 2>&1 && nvm_brew_prefix="$(brew --prefix nvm 2>/dev/null)"
-
-  if [ -s "${HOME}/.nvm/nvm.sh" ]; then
-    readonly URDABASH_LOADED_NVM=1
-    export NVM_DIR="${HOME}/.nvm"
-    _source_if_exists "${NVM_DIR}/nvm.sh"
-    _source_if_exists "${NVM_DIR}/bash_completion"
-  elif [ -n "${nvm_brew_prefix}" ] && [ -f "${nvm_brew_prefix}/nvm.sh" ]; then
-    readonly URDABASH_LOADED_NVM=1
-    export NVM_DIR="${HOME}/.nvm"
-    _source_if_exists "${nvm_brew_prefix}/nvm.sh"
-    _source_if_exists "${nvm_brew_prefix}/etc/bash_completion.d/nvm"
-  else
-    readonly URDABASH_LOADED_NVM=0
-  fi
-
-  unset nvm_brew_prefix
-fi
-
-# ------------------------------
-# pyenv
-# ------------------------------
-if command -v pyenv >/dev/null 2>&1 && [[ -z ${URDABASH_LOADED_PYENV+x} ]]; then
-  readonly URDABASH_LOADED_PYENV=1
-  export PYENV_ROOT="${HOME}/.pyenv"
-
-  _prepend_path_once "${PYENV_ROOT}/bin"
-
-  eval "$(pyenv init -)"
-  if command -v pyenv-virtualenv >/dev/null 2>&1; then
-    eval "$(pyenv virtualenv-init -)"
-
-    lsvirtualenv () { pyenv virtualenvs --bare --skip-aliases; }
-    mkvirtualenv () { pyenv virtualenv "${@}"; }
-    rmvirtualenv () { pyenv uninstall "${@}"; }
-  fi
+if command -v fnm >/dev/null 2>&1 && [[ -z ${URDABASH_LOADED_FNM+x} ]]; then
+  readonly URDABASH_LOADED_FNM=1
+  eval "$(fnm env --use-on-cd --shell bash)"
+else
+  readonly URDABASH_LOADED_FNM=0
 fi
 
 ################################################################################
 # Update Check
 ################################################################################
 
-_urdabash_version_check "noop"
+_urdabash_version_check "auto"
 
 ################################################################################
 # Prompt Functions
@@ -269,15 +237,6 @@ _ps1_screen_line() {
     "${outline}" $'\xE2\x95\xa0' $'\xE2\x95\x90' "${green}" "${reset}" "${outline}" "${blue}" "${STY}" "${outline}" "${reset}"
 }
 
-# ╠═[virtualenv : virtualenv_name]
-_ps1_virtualenv_line() {
-  local outline=${1} green=${2} blue=${3} reset=${4} venv_path=${5}
-  [[ -n "${venv_path}" ]] || return 0
-  local venv=${venv_path##*/}  # take only the last path segment
-  printf '%s%s%s[%svirtualenv%s %s: %s%s%s]%s\\n' \
-    "${outline}" $'\xE2\x95\xa0' $'\xE2\x95\x90' "${green}" "${reset}" "${outline}" "${blue}" "${venv}" "${outline}" "${reset}"
-}
-
 # ╚═ $
 _ps1_footer_line() {
   local outline=${1} term_char=${2} reset=${3}
@@ -311,7 +270,6 @@ _set_ps1() {
     _ps1_header_line "${Outline}" "${BGreen}" "${BBlue}" "${Color_Off}"
     _ps1_git_line "${Outline}" "${BGreen}" "${BBlue}" "${Color_Off}"
     _ps1_screen_line "${Outline}" "${BGreen}" "${BBlue}" "${Color_Off}"
-    _ps1_virtualenv_line "${Outline}" "${BGreen}" "${BBlue}" "${Color_Off}" "${PYENV_VIRTUAL_ENV}"
     _ps1_footer_line "${Outline}" "${TermChar}" "${Color_Off}"
   )
   PS1=${prompt}

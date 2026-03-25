@@ -1,5 +1,43 @@
 # CHANGELOG
 
+## 1.2.0
+
+This is a general minor release.
+
+- `bashrc`
+  - Add guards for other `URDABASH_LOADED_*` variables when modules are not loaded.
+  - Removed `pyenv` support. Use `uv` instead.
+  - Removed `_ps1_virtualenv_line` prompt line (no longer needed without `pyenv`).
+  - Removed `lesspipe` support.
+  - Removed `_postpend_path_once` (unused).
+  - Moved Linux bash completions to `bash_linux`.
+  - Replaced `NVM` with `fnm` (Fast Node Manager).
+  - Added `URDABASH_LOADED_1PASSWORD` guard for 1Password plugin loading.
+  - Added `URDABASH_LOADED_FNM` tracking variable.
+  - Version check (`_urdabash_version_check`) now runs network fetch in background.
+  - Changed version check call from `"noop"` to `"auto"` for clarity.
+  - Added `BASH_VERSION` to `_urdabash_info` output.
+- `bash_aliases`
+  - Switched `colordiff` check from `hash` to `command -v` for consistency.
+  - Changed `ll` alias from `ls -hlFs` to `ls -hlF` (removed block size column).
+- `bash_exports`
+  - Explicitly set `GIT_PS1_SHOWUPSTREAM` to `false`.
+  - Increased `HISTSIZE` to `50000` and `HISTFILESIZE` to `100000`.
+- `bash_linux`
+  - Added `ls` and `grep` color aliases via `dircolors`.
+  - Added bash completions (moved from `bashrc`).
+- `bash_osx`
+  - Added `HOMEBREW_NO_AUTO_UPDATE` to prevent surprise updates on `brew install`.
+  - Added `URDABASH_LOADED_HOMEBREW` guard to prevent re-initialization on re-source.
+  - Switched bash completions to use `_source_if_exists`.
+  - Added `local` declarations to `update_brew` to avoid leaking variables.
+- `Makefile`
+  - Replaced `ack` with `grep -E` in `make help`.
+- `README.md`
+  - Updated features and special functions to reflect 1.2.0 changes.
+- GitHub
+  - Fixed typo in workflow name.
+
 ## 1.1.2
 
 This is a bugfix release. `_urdabash_version_check` would incorrectly report `nvm` loaded status.

@@ -11,10 +11,13 @@
 
 # Silence notice about `zsh`.
 export BASH_SILENCE_DEPRECATION_WARNING=1
+
 # Enable CLI Colors
 export CLICOLOR=YES
+
 # Tab ignores
 export FIGNORE=${FIGNORE:+${FIGNORE}:}.DS_Store:.Trash
+
 # GPG Pin Entry CLI setup
 export PINENTRY_USER_DATA="USE_CURSES=1"
 
@@ -26,14 +29,19 @@ export PINENTRY_USER_DATA="USE_CURSES=1"
 # Homebrew
 # ------------------------------
 # urda.bash supports Homebrew on Apple Silicon only.
-if [ -x /opt/homebrew/bin/brew ]; then
+if [ -x /opt/homebrew/bin/brew ] && [[ -z ${URDABASH_LOADED_HOMEBREW+x} ]]; then
+  readonly URDABASH_LOADED_HOMEBREW=1
   eval "$(/opt/homebrew/bin/brew shellenv)"
 
   # Hide Homebrew Env Hints
   export HOMEBREW_NO_ENV_HINTS=true
 
+  # Disable auto-update on install/upgrade; use `update_brew` instead
+  export HOMEBREW_NO_AUTO_UPDATE=1
+
   # Custom Homebrew updater function
   update_brew() {
+    local bold normal
     bold=$(tput bold 2>/dev/null || printf '')
     normal=$(tput sgr0 2>/dev/null || printf '')
     brew --version &&
@@ -45,17 +53,9 @@ if [ -x /opt/homebrew/bin/brew ]; then
   }
 
   # ------------------------------
-  # Homebrew extras
-  # ------------------------------
-  brew_prefix="$(brew --prefix 2>/dev/null)"
-
-  # ------------------------------
   # Bash completions
   # ------------------------------
-  if [ -n "${brew_prefix}" ] && [ -f "${brew_prefix}/etc/bash_completion" ]; then
-    # shellcheck source=/dev/null
-    source "${brew_prefix}/etc/bash_completion"
-  fi
-
-  unset brew_prefix
+  _source_if_exists "$(brew --prefix 2>/dev/null)/etc/bash_completion"
+else
+  readonly URDABASH_LOADED_HOMEBREW=0
 fi
