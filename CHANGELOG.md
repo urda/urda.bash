@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 1.2.1
+
+This is a bugfix release. `GIT_PS1_SHOWUPSTREAM` set to `"false"` still enabled the upstream indicator.
+
+- `bash_exports`
+  - Removed `GIT_PS1_SHOWUPSTREAM` export. Setting it to `"false"` does not disable it; the variable must be unset.
+
 ## 1.2.0
 
 This is a general minor release.
