@@ -20,7 +20,7 @@ bind 'set mark-symlinked-directories on' 2>/dev/null
 ################################################################################
 
 if [[ -z ${URDABASH_VERSION+x} ]]; then
-  readonly URDABASH_VERSION="1.2.1"
+  readonly URDABASH_VERSION="1.2.2"
   export URDABASH_VERSION
 fi
 
@@ -110,23 +110,26 @@ _urdabash_version_check() {
   fi
 
   # Background fetch: update timestamp and fetch remote version
-  (
-    mkdir -p "${state_dir}" || return
-    touch "${stamp}" || return
+  # Suppress job control notifications ([1] PID / [1]+ Done)
+  {
+    (
+      mkdir -p "${state_dir}" || return
+      touch "${stamp}" || return
 
-    local fetched
-    if command -v curl >/dev/null 2>&1; then
-      fetched=$(curl -fs -m 5 "${version_url}" 2>/dev/null) || return
-    elif command -v wget >/dev/null 2>&1; then
-      fetched=$(wget -qO- --timeout=5 --tries=1 "${version_url}" 2>/dev/null) || return
-    else
-      return
-    fi
+      local fetched
+      if command -v curl >/dev/null 2>&1; then
+        fetched=$(curl -fs -m 5 "${version_url}" 2>/dev/null) || return
+      elif command -v wget >/dev/null 2>&1; then
+        fetched=$(wget -qO- --timeout=5 --tries=1 "${version_url}" 2>/dev/null) || return
+      else
+        return
+      fi
 
-    fetched=${fetched//[[:space:]]/}
-    [ -n "${fetched}" ] && printf '%s' "${fetched}" > "${cached}"
-  ) &
-  disown
+      fetched=${fetched//[[:space:]]/}
+      [ -n "${fetched}" ] && printf '%s' "${fetched}" > "${cached}"
+    ) &
+    disown
+  } 2>/dev/null
 }
 
 ################################################################################

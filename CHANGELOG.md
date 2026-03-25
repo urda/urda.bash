@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 1.2.2
+
+This is a bugfix release. Background version check printed job control notifications.
+
+- `bashrc`
+  - Suppressed job control notifications from background version check.
+
 ## 1.2.1
 
 This is a bugfix release. `GIT_PS1_SHOWUPSTREAM` set to `"false"` still enabled the upstream indicator.
