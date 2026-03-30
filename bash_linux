@@ -14,8 +14,8 @@
 ################################################################################
 
 if [[ -f /etc/bash_completion ]] && ! shopt -oq posix; then
-    # shellcheck source=/dev/null
-    source /etc/bash_completion
+  # shellcheck source=/dev/null
+  source /etc/bash_completion
 fi
 
 ################################################################################
@@ -24,12 +24,12 @@ fi
 
 # Enable colors for certain commands
 if [ -x /usr/bin/dircolors ]; then
-    if [ -r ~/.dircolors ]; then
-        eval "$(dircolors -b ~/.dircolors)"
-    else
-        eval "$(dircolors -b)"
-    fi
+  if [ -r ~/.dircolors ]; then
+    eval "$(dircolors -b ~/.dircolors)"
+  else
+    eval "$(dircolors -b)"
+  fi
 
-    alias ls='ls --color=auto'
-    alias grep='grep --color=auto'
+  alias ls='ls --color=auto'
+  alias grep='grep --color=auto'
 fi

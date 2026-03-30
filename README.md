@@ -2,12 +2,16 @@
 
 This is a collection of my bash prompt settings, aliases, exports, and other related shell scripts.
 
-# `urda.bash` Features
+## Features
 
 - Exposes the [`XDG Base Directory`](https://specifications.freedesktop.org/basedir/latest/) specification variables.
 - Supports loading `bash` shell parts based on host operating system:
   - `bash_linux` - For Linux platforms.
-  - `bash_osx` - For macOS platforms.
+  - `bash_osx` - For macOS platforms (supports `bash-completion` v1 and v2).
+- Loads common definitions from:
+  - `bash_exports` - Environment variables.
+  - `bash_aliases` - Aliases.
+  - `bash_functions` - Functions.
 - Displays "information lines" in shell:
   - `git` working state information.
   - `screen` session name.
@@ -20,26 +24,67 @@ This is a collection of my bash prompt settings, aliases, exports, and other rel
 
 Should work with `bash 3.2` or higher.
 
-# `urda.bash` Special Functions
+### Aliases
 
-These are helper functions for `urda.bash`. You should not rely on them as a public API at this time.
+- `clear` - Hard reset the terminal screen.
+- `cp` - Copy with overwrite confirmation and verbose output.
+- `diff` - Unified diff format, with color via `colordiff` when available.
+- `epoch` - Print current unix timestamp (seconds).
+- `get_uuid` - Generate a random UUID.
+- `headers` - Fetch HTTP response headers only.
+- `ll` - Long listing format (`ls -hlF`).
+- `moon` - Current moon phase via `wttr.in`.
+- `mv` - Move with overwrite confirmation and verbose output.
+- `path` - Print `PATH` entries, one per line.
+- `publicip` - Print public IP address.
+- `serve` - Start a quick HTTP server in the current directory (port 8000).
+- `sudo` - Preserves alias expansion when using `sudo`.
+- `weather` - Terminal weather forecast via `wttr.in`.
+
+### Functions
+
+- `psg`
+  - Search running processes by name. Filters out the `grep` process itself.
+- `unarc`
+  - Extract common archive formats by file extension.
+- `update_brew` *(macOS only)*
+  - Runs `brew update`, `upgrade`, `autoremove`, `cleanup`, and `doctor` in sequence.
+
+#### Internal Functions
+
+These are internal helpers for `urda.bash`. You should not rely on them as a public API.
 
 - `_prepend_path_once`
-  - Prepends a value to the `${PATH}` variable ONCE, and avoids duplicates.
+  - Prepends a value to `${PATH}` once, avoiding duplicates.
 - `_source_if_exists`
-  - Internal helper function to only `source` a file if it exists, skips otherwise.
+  - Sources a file if it exists, skips otherwise.
 - `_urdabash_info`
-  - You can invoke this to see a little information printout about the current `urda.bash` configuration.
+  - Prints information about the current `urda.bash` configuration.
 - `_urdabash_version_check`
-  - This handles checking for a different `VERSION` (which should mean a new `urda.bash` release is out).
+  - Checks for a newer `urda.bash` release on GitHub. Pass `now` for an on-demand check.
 
-# Working with `urda.bash` project files
+### Version Checking
 
-## Get `Makefile` help
+`urda.bash` checks for new releases weekly by fetching the `VERSION` file from GitHub in the background. If a newer version is available, a notice is printed on the next shell startup. This check is non-blocking and will not slow down your shell.
+
+Version check state is stored at `${XDG_STATE_HOME}/urda.bash/` (`~/.local/state/urda.bash/`):
+
+- `last_check` - Timestamp file used to determine when the next fetch is due.
+- `remote_version` - Cached remote version string from the last successful fetch.
+
+You can also trigger an on-demand check:
+
+```bash
+_urdabash_version_check now
+```
+
+## Working with `urda.bash` project files
+
+### Get `Makefile` help
 
 You can run a bare `make` or `make help` to display the help screen.
 
-## Comparing to your local bash
+### Comparing to your local bash
 
 After you clone this repo, you can also run a quick `diff` that will compare your local `bash` files against the repo files:
 
@@ -47,7 +92,7 @@ After you clone this repo, you can also run a quick `diff` that will compare you
 make diffs
 ```
 
-## Running tests
+### Running tests
 
 This will also run a `make version-check`.
 
@@ -55,7 +100,7 @@ This will also run a `make version-check`.
 make test
 ```
 
-## Copying files to your `${HOME}`
+### Copying files to your `${HOME}`
 
 **WARNING!** This is a **DESTRUCTIVE** operation and copies `bash` files from the project into your `${HOME}`.
 
@@ -63,6 +108,6 @@ make test
 make copy
 ```
 
-## Project version check
+### Project version check
 
 Just run `make version-check`.

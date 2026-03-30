@@ -55,7 +55,18 @@ if [ -x /opt/homebrew/bin/brew ] && [[ -z ${URDABASH_LOADED_HOMEBREW+x} ]]; then
   # ------------------------------
   # Bash completions
   # ------------------------------
-  _source_if_exists "$(brew --prefix 2>/dev/null)/etc/bash_completion"
+  _brew_prefix="$(brew --prefix 2>/dev/null)"
+  # Prefer bash-completion v2 (requires bash 4.2+), fall back to v1
+  if [[ -r "${_brew_prefix}/etc/profile.d/bash_completion.sh" ]]; then
+    # bash-completion v2
+    # shellcheck source=/dev/null
+    source "${_brew_prefix}/etc/profile.d/bash_completion.sh"
+  elif [[ -r "${_brew_prefix}/etc/bash_completion" ]]; then
+    # bash-completion v1
+    # shellcheck source=/dev/null
+    source "${_brew_prefix}/etc/bash_completion"
+  fi
+  unset _brew_prefix
 else
   readonly URDABASH_LOADED_HOMEBREW=0
 fi

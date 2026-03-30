@@ -1,5 +1,42 @@
 # CHANGELOG
 
+## 1.3.0
+
+This is a general minor release.
+
+- `bashrc`
+  - Moved `_prepend_path_once` calls for `~/bin` and `~/.local/bin` to end of file so user paths take highest priority.
+  - Fixed `direnv` and `fnm` blocks to prevent `readonly` errors on re-source.
+  - Improved prompt rendering performance by removing unnecessary forks.
+  - Moved general functions to `bash_functions`.
+- `bash_aliases`
+  - Added `epoch` alias to print current unix timestamp.
+  - Added `cp` alias for copy with overwrite confirmation and verbose output.
+  - Added `headers` alias to fetch HTTP response headers.
+  - Added `moon` alias for current moon phase via `wttr.in`.
+  - Added `mv` alias for move with overwrite confirmation and verbose output.
+  - Added `path` alias to print `PATH` entries one per line.
+  - Added `publicip` alias to print public IP address via `icanhazip.com`.
+  - Added `serve` alias for quick HTTP server via `python3 -m http.server`.
+  - Added `weather` alias for terminal weather forecast via `wttr.in`.
+- `bash_functions`
+  - New file for general functions (`_prepend_path_once`, `_urdabash_info`, `_urdabash_version_check`).
+  - Added `psg` function to search running processes.
+  - Added `unarc` function to extract common archive formats.
+- `bash_linux`
+  - Fixed indentation consistency.
+- `bash_osx`
+  - Added support for `bash-completion` v2, with fallback to v1.
+- `Makefile`
+  - Added `bash_functions` to `copy` and `diffs` targets.
+  - Fixed `diffs` argument order so output reads as "what the update would do."
+  - Added `SC2009` to shellcheck exclusions.
+- `README.md`
+  - Adjusted header levels.
+  - Added aliases documentation section.
+  - Added functions and internal functions documentation sections.
+  - Added version checking documentation section.
+
 ## 1.2.2
 
 This is a bugfix release. Background version check printed job control notifications.
