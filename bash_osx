@@ -68,5 +68,5 @@ if [ -x /opt/homebrew/bin/brew ] && [[ -z ${URDABASH_LOADED_HOMEBREW+x} ]]; then
   fi
   unset _brew_prefix
 else
-  readonly URDABASH_LOADED_HOMEBREW=0
+  [[ -z ${URDABASH_LOADED_HOMEBREW+x} ]] && readonly URDABASH_LOADED_HOMEBREW=0
 fi

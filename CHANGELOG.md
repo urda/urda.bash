@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 1.3.1
+
+This is a bugfix release. `URDABASH_LOADED_HOMEBREW` guard caused `readonly` error on re-source.
+
+- `bash_osx`
+  - Fixed Homebrew guard to prevent `readonly` error when re-sourcing bashrc.
+
 ## 1.3.0
 
 This is a general minor release.
