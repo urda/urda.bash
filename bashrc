@@ -20,12 +20,12 @@ bind 'set mark-symlinked-directories on' 2>/dev/null
 ################################################################################
 
 if [[ -z ${URDABASH_VERSION+x} ]]; then
-  readonly URDABASH_VERSION="1.3.1"
+  readonly URDABASH_VERSION="2.0.0"
   export URDABASH_VERSION
 fi
 
 if [[ -z ${URDABASH_VERSION_URL+x} ]]; then
-  readonly URDABASH_VERSION_URL="https://raw.githubusercontent.com/urda/urda.bash/refs/heads/master/VERSION"
+  readonly URDABASH_VERSION_URL="https://raw.githubusercontent.com/urda/urda.bash/master/VERSION"
   export URDABASH_VERSION_URL
 fi
 
@@ -40,6 +40,8 @@ export XDG_DATA_HOME="${HOME}/.local/share"
 export XDG_STATE_HOME="${HOME}/.local/state"
 
 _source_if_exists() {
+  # Source a file if it exists and is readable, skip otherwise.
+  # Usage: _source_if_exists <file>
   # shellcheck source=/dev/null
   [[ -n "${1}" && -r "${1}" ]] && source "${1}"
 }
@@ -51,16 +53,7 @@ _source_if_exists() {
 # Load common export definitions
 _source_if_exists "${HOME}/.bash_exports"
 
-# Load common alias definitions
-_source_if_exists "${HOME}/.bash_aliases"
-
-# Load common function definitions
-_source_if_exists "${HOME}/.bash_functions"
-
-# Load any secrets
-_source_if_exists "${HOME}/.bash_secrets"
-
-# Let's handle specific systems now
+# Load OS-specific configs (sets up Homebrew, PATH, completions)
 case ${URDABASH_OS} in
   # macOS / OSX
   Darwin)
@@ -70,6 +63,15 @@ case ${URDABASH_OS} in
     _source_if_exists "${HOME}/.bash_linux"
     ;;
 esac
+
+# Load common alias definitions
+_source_if_exists "${HOME}/.bash_aliases"
+
+# Load common function definitions
+_source_if_exists "${HOME}/.bash_functions"
+
+# Load any secrets
+_source_if_exists "${HOME}/.bash_secrets"
 
 ################################################################################
 # Tooling
@@ -117,7 +119,7 @@ fi
 # Update Check
 ################################################################################
 
-_urdabash_version_check "auto"
+_urdabash_version_check
 
 ################################################################################
 # Prompt Functions
@@ -130,8 +132,8 @@ _urdabash_version_check "auto"
 # - $'\xE2\x95\x9A' ..... '╚'
 ################################################################################
 
-# ╔═[user@host : /current/working/directory]
 _ps1_header_line() {
+  # Render the prompt header: ╔═[user@host : /current/working/directory]
   local outline=${1} green=${2} blue=${3} reset=${4}
   local _line
   printf -v _line '%s%s%s[%s\\u@\\h%s %s: %s\\w%s]%s\\n%s' \
@@ -139,9 +141,9 @@ _ps1_header_line() {
   _PS1_BUF+=${_line}
 }
 
-# ╠═[git : branch_name]
 _ps1_git_line() {
-  # Quick builtin check before forking for __git_ps1
+  # Render the git prompt line: ╠═[git : branch_name]
+  # Walks up the directory tree to detect .git before forking for __git_ps1.
   local _dir="${PWD}"
   while [[ "${_dir}" != "/" ]]; do
     [[ -e "${_dir}/.git" ]] && break
@@ -161,8 +163,9 @@ _ps1_git_line() {
   _PS1_BUF+=${_line}
 }
 
-# ╠═[screen : screen_name]
 _ps1_screen_line() {
+  # Render the screen prompt line: ╠═[screen : session_name]
+  # Only shown when inside a GNU screen session (STY is set).
   [[ -n "${STY}" ]] || return 0
   local outline=${1} green=${2} blue=${3} reset=${4}
   local _line
@@ -171,8 +174,8 @@ _ps1_screen_line() {
   _PS1_BUF+=${_line}
 }
 
-# ╚═ $
 _ps1_footer_line() {
+  # Render the prompt footer: ╚═ $ (or # for root)
   local outline=${1} term_char=${2} reset=${3}
   local _line
   printf -v _line '%s%s%s %s%s ' "${outline}" $'\xE2\x95\x9A' $'\xE2\x95\x90' "${term_char}" "${reset}"
@@ -184,7 +187,9 @@ _ps1_footer_line() {
 ################################################################################
 
 _set_ps1() {
-  # Set prompt variables
+  # Build and set PS1 by assembling header, git, screen, and footer lines.
+  # Runs via PROMPT_COMMAND before each prompt is displayed.
+  # Root sessions get a red outline and # terminator.
   local BBlue='\[\e[1;34m\]'
   local BGreen='\[\e[1;32m\]'
   local BRed='\[\e[1;31m\]'

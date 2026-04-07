@@ -6,13 +6,17 @@
 # Functions
 ################################################################################
 
-# Search running processes (filters out the grep process itself).
 psg() {
+  # Search running processes by name.
+  # Filters out the grep process itself to avoid false matches.
+  # Usage: psg <pattern>
   ps aux | grep -v grep | grep -i "$@"
 }
 
-# Extract common archive formats by file extension.
 unarc() {
+  # Extract common archive formats by file extension.
+  # Supports: tar.bz2, tar.gz, tar.lzma, tar.xz, tar, 7z, bz2, gz, lzma, rar, xz, Z, zip
+  # Usage: unarc <file>
   if [ ! -f "${1}" ]; then
     echo "'${1}' is not a valid file"
     return 1
@@ -39,8 +43,9 @@ unarc() {
 # Internal Functions
 ################################################################################
 
-# Add to the FRONT of the PATH (unless already present).
 _prepend_path_once() {
+  # Prepend a directory to PATH if it exists and is not already present.
+  # Usage: _prepend_path_once <directory>
   local dir=${1}
   [[ -d ${dir} ]] || return
   case ":${PATH}:" in
@@ -51,7 +56,40 @@ _prepend_path_once() {
   esac
 }
 
+_urdabash_help() {
+  # Print a quick reference of all urda.bash aliases and functions.
+  echo "urda.bash ${URDABASH_VERSION} - Quick Reference"
+  echo ""
+  echo "Aliases:"
+  echo "  clear ........... Hard reset the terminal screen"
+  echo "  cp .............. Copy with overwrite confirmation and verbose output"
+  echo "  diff ............ Unified diff format, with color via colordiff when available"
+  echo "  epoch ........... Print current unix timestamp (seconds)"
+  echo "  get_uuid ........ Generate a random UUID"
+  echo "  headers ......... Fetch HTTP response headers only"
+  echo "  ll .............. Long listing format (ls -hlF)"
+  echo "  moon ............ Current moon phase via wttr.in"
+  echo "  mv .............. Move with overwrite confirmation and verbose output"
+  echo "  path ............ Print PATH entries, one per line"
+  echo "  publicip ........ Print public IP address via icanhazip.com"
+  echo "  serve ........... Start a quick HTTP server (port 8000)"
+  echo "  sudo ............ Preserves alias expansion under sudo"
+  echo "  weather ......... Terminal weather forecast via wttr.in"
+  echo ""
+  echo "Functions:"
+  echo "  psg ............. Search running processes by name"
+  echo "  unarc ........... Extract common archive formats"
+  echo "  update_brew ..... Run full Homebrew maintenance (macOS only)"
+  echo ""
+  echo "Internal:"
+  echo "  _urdabash_help ............. This help screen"
+  echo "  _urdabash_info ............. Print loaded module status"
+  echo "  _urdabash_update ........... Self-update urda.bash from GitHub"
+  echo "  _urdabash_version_check .... Check for a newer release (pass 'now' to force)"
+}
+
 _urdabash_info() {
+  # Print urda.bash configuration and loaded module status.
   local onepassword_status="0"
   local direnv_status="0"
   local fnm_status="0"
@@ -72,12 +110,16 @@ _urdabash_info() {
 }
 
 _urdabash_version_check() {
-  local state_dir="${XDG_STATE_HOME:-${HOME}/.local/state}/urda.bash"
-  local stamp="${state_dir}/last_check"
+  # Check for a newer urda.bash release on GitHub.
+  # Reads a cached remote version for instant comparison, then schedules
+  # a background fetch if the cache is stale (older than 7 days).
+  # Usage: _urdabash_version_check [now]
+  #   now - skip the interval check and force a background fetch
+  local state_dir="${XDG_STATE_HOME}/urda.bash"
   local cached="${state_dir}/remote_version"
-  local version_url="${URDABASH_VERSION_URL}"
+  local force_check_now=${1:-}  # pass "now" to skip interval and force fetch
   local interval=604800  # 7 days
-  local force_check_now=${1:-}
+  local last_check_timestamp="${state_dir}/last_check"
 
   # Check cached remote version (instant, no network)
   if [ -f "${cached}" ]; then
@@ -85,7 +127,11 @@ _urdabash_version_check() {
     remote=$(<"${cached}")
     remote=${remote//[[:space:]]/}
     if [ -n "${remote}" ] && [ "${remote}" != "${URDABASH_VERSION}" ]; then
-      printf "An urda.bash update is available:\nLocal version:  '%s'\nRemote version: '%s'\n" "${URDABASH_VERSION}" "${remote}" >&2
+      local newest
+      newest=$(printf '%s\n%s' "${remote}" "${URDABASH_VERSION}" | sort -V | tail -1)
+      if [ "${newest}" = "${remote}" ]; then
+        printf "An urda.bash update is available:\nLocal version:  '%s'\nRemote version: '%s'\nRun '_urdabash_update' to update.\n" "${URDABASH_VERSION}" "${remote}" >&2
+      fi
     fi
   fi
 
@@ -93,8 +139,8 @@ _urdabash_version_check() {
   local now
   local last=0
   now=$(date +%s)
-  if [ -f "${stamp}" ]; then
-    last=$(stat -c %Y "${stamp}" 2>/dev/null || stat -f %m "${stamp}" 2>/dev/null || echo 0)
+  if [ -f "${last_check_timestamp}" ]; then
+    last=$(stat -c %Y "${last_check_timestamp}" 2>/dev/null || stat -f %m "${last_check_timestamp}" 2>/dev/null || echo 0)
   fi
   if [[ ${force_check_now} != now ]] && (( now - last < interval )); then
     return
@@ -105,20 +151,116 @@ _urdabash_version_check() {
   {
     (
       mkdir -p "${state_dir}" || return
-      touch "${stamp}" || return
+      touch "${last_check_timestamp}" || return
 
+      command -v curl >/dev/null 2>&1 || return
       local fetched
-      if command -v curl >/dev/null 2>&1; then
-        fetched=$(curl -fs -m 5 "${version_url}" 2>/dev/null) || return
-      elif command -v wget >/dev/null 2>&1; then
-        fetched=$(wget -qO- --timeout=5 --tries=1 "${version_url}" 2>/dev/null) || return
-      else
-        return
-      fi
+      fetched=$(curl -fs -m 5 "${URDABASH_VERSION_URL}" 2>/dev/null) || return
 
       fetched=${fetched//[[:space:]]/}
       [ -n "${fetched}" ] && printf '%s' "${fetched}" > "${cached}"
     ) &
     disown
   } 2>/dev/null
+}
+
+_urdabash_update() {
+  # Self-update urda.bash by fetching the latest files from GitHub.
+  # Downloads VERSION and MANIFEST from remote, stages all managed files
+  # to a cache directory, verifies the download, and copies to ~/.
+  # Requires curl. No git required.
+  local base_url="${URDABASH_VERSION_URL%/*}"
+  local cache_dir="${XDG_CACHE_HOME}/urda.bash/upgrade"
+  local actual_count
+  local confirm
+  local expected_count
+  local file
+  local remote_manifest
+  local remote_version
+
+  # Require curl
+  if ! command -v curl >/dev/null 2>&1; then
+    echo "Error: curl is required for updates" >&2
+    return 1
+  fi
+
+  # Fetch remote version
+  echo "Checking for updates..."
+  remote_version=$(curl -fs -m 10 "${base_url}/VERSION")
+  remote_version=${remote_version//[[:space:]]/}
+
+  if [[ -z ${remote_version} ]]; then
+    echo "Error: failed to fetch remote version" >&2
+    return 1
+  fi
+
+  local newest
+  newest=$(printf '%s\n%s' "${remote_version}" "${URDABASH_VERSION}" | sort -V | tail -1)
+  if [[ ${newest} == "${URDABASH_VERSION}" ]]; then
+    echo "Already up to date, local is ${URDABASH_VERSION}, remote is ${remote_version}"
+    return 0
+  fi
+
+  echo "Update available: ${URDABASH_VERSION} -> ${remote_version}"
+
+  # Fetch remote MANIFEST
+  echo "Downloading update MANIFEST..."
+  remote_manifest=$(curl -fs -m 10 "${base_url}/MANIFEST")
+
+  if [[ -z ${remote_manifest} ]]; then
+    echo "Error: failed to fetch remote MANIFEST" >&2
+    return 1
+  fi
+
+  # Download files listed in MANIFEST
+  rm -rf "${cache_dir}"
+  mkdir -p "${cache_dir}"
+
+  while IFS= read -r file; do
+    [[ -z ${file} ]] && continue
+    echo "  Downloading ${file}..."
+    if ! curl -fs -m 10 -o "${cache_dir}/${file}" "${base_url}/${file}"; then
+      echo "Error: failed to download ${file}" >&2
+      rm -rf "${cache_dir}"
+      return 1
+    fi
+  done <<< "${remote_manifest}"
+
+  # Verify downloads
+  expected_count=$(echo "${remote_manifest}" | grep -c .)
+  actual_count=$(find "${cache_dir}" -type f | grep -c .)
+
+  if [[ ${expected_count} -ne ${actual_count} ]]; then
+    echo "Error: expected ${expected_count} files, got ${actual_count}" >&2
+    rm -rf "${cache_dir}"
+    return 1
+  fi
+
+  if [[ -n $(find "${cache_dir}" -type f -empty -print -quit) ]]; then
+    echo "Error: empty files detected in download" >&2
+    rm -rf "${cache_dir}"
+    return 1
+  fi
+
+  echo "Files staged and verified (${actual_count} files)"
+
+  # Confirm with user
+  read -r -p "Update urda.bash ${URDABASH_VERSION} -> ${remote_version}? [Y/N] " confirm
+
+  if [[ ${confirm} != [yY] ]]; then
+    echo "Update cancelled"
+    rm -rf "${cache_dir}"
+    return 0
+  fi
+
+  # Copy files to home directory
+  while IFS= read -r file; do
+    [[ -z ${file} ]] && continue
+    cp -v "${cache_dir}/${file}" "${HOME}/.${file}"
+  done <<< "${remote_manifest}"
+
+  # Cleanup and report
+  rm -rf "${cache_dir}"
+  echo "urda.bash updated: ${URDABASH_VERSION} -> ${remote_version}"
+  echo "Open a new shell to use the new version."
 }

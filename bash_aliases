@@ -34,7 +34,7 @@ alias moon='curl -sL https://wttr.in/Moon?F'
 alias mv='mv -iv'
 
 # print PATH, one entry per line
-alias path='echo "$PATH" | tr ":" "\n"'
+alias path='echo "${PATH}" | tr ":" "\n"'
 
 # print public IP address
 alias publicip='curl -sL --max-time 5 https://icanhazip.com'

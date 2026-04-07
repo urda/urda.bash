@@ -39,8 +39,9 @@ if [ -x /opt/homebrew/bin/brew ] && [[ -z ${URDABASH_LOADED_HOMEBREW+x} ]]; then
   # Disable auto-update on install/upgrade; use `update_brew` instead
   export HOMEBREW_NO_AUTO_UPDATE=1
 
-  # Custom Homebrew updater function
   update_brew() {
+    # Run the full Homebrew maintenance sequence.
+    # Steps: update, upgrade, autoremove, cleanup, doctor.
     local bold normal
     bold=$(tput bold 2>/dev/null || printf '')
     normal=$(tput sgr0 2>/dev/null || printf '')

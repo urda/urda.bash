@@ -1,5 +1,41 @@
 # CHANGELOG
 
+## 2.0.0
+
+This major release adds a bootstrap installer and built-in updater.
+
+- `bashrc`
+  - Reordered sourcing: OS-specific files now load before aliases and functions.
+  - Removed unused `"auto"` argument from version check call.
+  - Added doc blocks inside all functions.
+- `bash_aliases`
+  - Fixed unbraced `$PATH` variable in `path` alias.
+- `bash_functions`
+  - Added `_urdabash_update` for self-updating without git.
+  - Version check now uses semver comparison (no longer alerts when running a newer local version).
+  - Version check hints about `_urdabash_update` when an update is available.
+  - Removed `wget` support. `curl` is now required.
+  - Removed XDG fallback defaults (XDG variables are expected to be set).
+  - Documented `"now"` parameter on `_urdabash_version_check`.
+  - Added `_urdabash_help` quick reference for all aliases and functions.
+  - Added doc blocks inside all functions.
+- `bash_osx`
+  - Added doc block inside `update_brew`.
+- `install.sh`
+  - New bootstrap installer for fresh machines.
+- `Makefile`
+  - Added `MANIFEST` as single source of truth for managed files.
+  - Added `manifest-check` target to validate MANIFEST in CI.
+  - Added `test-update` target for testing the update function.
+  - `copy`, `diffs`, and shellcheck now driven by MANIFEST.
+- `MANIFEST`
+  - New file listing all managed bash files.
+- `README.md`
+  - Added Installing and Updating sections.
+  - Added `_urdabash_help` and `_urdabash_update` to internal functions documentation.
+- `.github/pull_request_template.md`
+  - Updated pull request template.
+
 ## 1.3.1
 
 This is a bugfix release. `URDABASH_LOADED_HOMEBREW` guard caused `readonly` error on re-source.

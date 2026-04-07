@@ -58,25 +58,41 @@ These are internal helpers for `urda.bash`. You should not rely on them as a pub
   - Prepends a value to `${PATH}` once, avoiding duplicates.
 - `_source_if_exists`
   - Sources a file if it exists, skips otherwise.
+- `_urdabash_help`
+  - Prints a quick reference of all aliases and functions.
 - `_urdabash_info`
   - Prints information about the current `urda.bash` configuration.
+- `_urdabash_update`
+  - Self-updates `urda.bash` by fetching the latest files from GitHub. No `git` required.
 - `_urdabash_version_check`
   - Checks for a newer `urda.bash` release on GitHub. Pass `now` for an on-demand check.
 
-### Version Checking
+### Installing
 
-`urda.bash` checks for new releases weekly by fetching the `VERSION` file from GitHub in the background. If a newer version is available, a notice is printed on the next shell startup. This check is non-blocking and will not slow down your shell.
+Bootstrap `urda.bash` on a new machine with a single command:
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/urda/urda.bash/master/install.sh)"
+```
+
+### Updating
+
+`urda.bash` checks for new releases weekly in the background. If a newer version is found, a notice is printed on your next shell startup. To update, run:
+
+```bash
+_urdabash_update
+```
+
+You can also force an on-demand version check:
+
+```bash
+_urdabash_version_check now
+```
 
 Version check state is stored at `${XDG_STATE_HOME}/urda.bash/` (`~/.local/state/urda.bash/`):
 
 - `last_check` - Timestamp file used to determine when the next fetch is due.
 - `remote_version` - Cached remote version string from the last successful fetch.
-
-You can also trigger an on-demand check:
-
-```bash
-_urdabash_version_check now
-```
 
 ## Working with `urda.bash` project files
 
