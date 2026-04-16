@@ -6,11 +6,41 @@
 # Functions
 ################################################################################
 
+bak() {
+  # Back up a file with a .bak extension.
+  # Usage: bak <file>
+  cp -v "${1}" "${1}.bak"
+}
+
+coinflip() {
+  # Flip a coin.
+  # Usage: coinflip
+  (( RANDOM % 2 )) && echo "heads" || echo "tails"
+}
+
+mkcd() {
+  # Create a directory and cd into it in one step.
+  # Usage: mkcd <directory>
+  mkdir -p "${1}" && cd "${1}" || return
+}
+
 psg() {
   # Search running processes by name.
   # Filters out the grep process itself to avoid false matches.
   # Usage: psg <pattern>
-  ps aux | grep -v grep | grep -i "$@"
+  ps aux | grep -v grep | grep -i "${@}"
+}
+
+roll() {
+  # Roll a die (d6 by default, or specify sides).
+  # Usage: roll [sides]
+  echo $(( RANDOM % ${1:-6} + 1 ))
+}
+
+tempdir() {
+  # Create and cd into a disposable temporary directory.
+  # Usage: tempdir
+  cd "$(mktemp -d)" || return
 }
 
 unarc() {
@@ -39,6 +69,26 @@ unarc() {
   esac
 }
 
+_unarc_completions() {
+  # Tab-completion for unarc: suggest archive files and directories.
+  local cur="${COMP_WORDS[COMP_CWORD]}"
+  local files
+  mapfile -t files < <(compgen -f -- "${cur}")
+  for f in "${files[@]}"; do
+    if [[ -d "${f}" ]]; then
+      COMPREPLY+=( "${f}" )
+    else
+      case "${f}" in
+        *.tar.bz2|*.tbz2|*.tar.gz|*.tgz|*.tar.lzma|*.tar.xz|*.tar| \
+        *.7z|*.bz2|*.gz|*.lzma|*.rar|*.xz|*.Z|*.zip)
+          COMPREPLY+=( "${f}" )
+          ;;
+      esac
+    fi
+  done
+}
+complete -o filenames -F _unarc_completions unarc
+
 ################################################################################
 # Internal Functions
 ################################################################################
@@ -62,7 +112,9 @@ _urdabash_help() {
   echo ""
   echo "Aliases:"
   echo "  clear ........... Hard reset the terminal screen"
+  echo "  commitjoke ...... Random commit message from whatthecommit.com"
   echo "  cp .............. Copy with overwrite confirmation and verbose output"
+  echo "  dadjoke ......... Random dad joke from icanhazdadjoke.com"
   echo "  diff ............ Unified diff format, with color via colordiff when available"
   echo "  epoch ........... Print current unix timestamp (seconds)"
   echo "  get_uuid ........ Generate a random UUID"
@@ -73,11 +125,20 @@ _urdabash_help() {
   echo "  path ............ Print PATH entries, one per line"
   echo "  publicip ........ Print public IP address via icanhazip.com"
   echo "  serve ........... Start a quick HTTP server (port 8000)"
+  echo "  shrug ........... Print the shrug emoticon"
   echo "  sudo ............ Preserves alias expansion under sudo"
+  echo "  tableflip ....... Print the table flip emoticon"
+  echo "  tableunflip ..... Print the table unflip emoticon"
+  echo "  timestamp ....... Current UTC timestamp (ISO 8601)"
   echo "  weather ......... Terminal weather forecast via wttr.in"
   echo ""
   echo "Functions:"
+  echo "  bak ............. Back up a file with a .bak extension"
+  echo "  coinflip ........ Flip a coin"
+  echo "  mkcd ............ Create a directory and cd into it"
   echo "  psg ............. Search running processes by name"
+  echo "  roll ............ Roll a die (d6 default, or specify sides)"
+  echo "  tempdir ......... Create and cd into a disposable temp directory"
   echo "  unarc ........... Extract common archive formats"
   echo "  update_brew ..... Run full Homebrew maintenance (macOS only)"
   echo ""
@@ -94,10 +155,14 @@ _urdabash_info() {
   local direnv_status="0"
   local fnm_status="0"
   local homebrew_status="0"
+  local local_status="0"
+  local pnpm_status="0"
   [[ -n ${URDABASH_LOADED_1PASSWORD+x} ]] && onepassword_status="${URDABASH_LOADED_1PASSWORD}"
   [[ -n ${URDABASH_LOADED_DIRENV+x} ]] && direnv_status="${URDABASH_LOADED_DIRENV}"
   [[ -n ${URDABASH_LOADED_FNM+x} ]] && fnm_status="${URDABASH_LOADED_FNM}"
   [[ -n ${URDABASH_LOADED_HOMEBREW+x} ]] && homebrew_status="${URDABASH_LOADED_HOMEBREW}"
+  [[ -n ${URDABASH_LOADED_LOCAL+x} ]] && local_status="${URDABASH_LOADED_LOCAL}"
+  [[ -n ${URDABASH_LOADED_PNPM+x} ]] && pnpm_status="${URDABASH_LOADED_PNPM}"
 
   echo "BASH_VERSION ................ ${BASH_VERSION}"
   echo "URDABASH_VERSION ............ ${URDABASH_VERSION}"
@@ -107,6 +172,8 @@ _urdabash_info() {
   echo "URDABASH_LOADED_DIRENV ...... ${direnv_status}"
   echo "URDABASH_LOADED_FNM ......... ${fnm_status}"
   echo "URDABASH_LOADED_HOMEBREW .... ${homebrew_status}"
+  echo "URDABASH_LOADED_LOCAL ....... ${local_status}"
+  echo "URDABASH_LOADED_PNPM ........ ${pnpm_status}"
 }
 
 _urdabash_version_check() {

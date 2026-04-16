@@ -12,7 +12,7 @@ DIFF := $(firstword $(shell which colordiff diff))
 DIFF_ARGS := -u
 MANIFEST_IGNORE := bash_history|bash_secrets
 SHELLCHECK := $(shell which shellcheck)
-SHELLCHECK_ARGS := --shell=bash -e SC1090 -e SC2009 -e SC2155
+SHELLCHECK_ARGS := --shell=bash -e SC1090 -e SC1091 -e SC2009 -e SC2155 -o require-variable-braces
 SHELLCHECK_FILES := $(addprefix ./,$(shell cat MANIFEST))
 
 ########################################################################################################################

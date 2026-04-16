@@ -16,11 +16,11 @@ jobs:
 
     steps:
       # https://github.com/marketplace/actions/checkout
-      - name: Checkout ⬇️
+      - name: ⬇️ Checkout
         uses: actions/checkout@v5
 
-      - name: Report `shellcheck` Version 🔍
+      - name: 🔍 Report `shellcheck` Version
         run: shellcheck --version
 
-      - name: urda.bash Testing 🧪
+      - name: 🧪 urda.bash Testing
         run: make test

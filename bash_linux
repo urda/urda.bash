@@ -24,8 +24,8 @@ fi
 
 # Enable colors for certain commands
 if [ -x /usr/bin/dircolors ]; then
-  if [ -r ~/.dircolors ]; then
-    eval "$(dircolors -b ~/.dircolors)"
+  if [ -r "${HOME}/.dircolors" ]; then
+    eval "$(dircolors -b "${HOME}/.dircolors")"
   else
     eval "$(dircolors -b)"
   fi

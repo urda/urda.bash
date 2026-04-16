@@ -20,7 +20,7 @@ bind 'set mark-symlinked-directories on' 2>/dev/null
 ################################################################################
 
 if [[ -z ${URDABASH_VERSION+x} ]]; then
-  readonly URDABASH_VERSION="2.0.0"
+  readonly URDABASH_VERSION="2.1.0"
   export URDABASH_VERSION
 fi
 
@@ -73,13 +73,23 @@ _source_if_exists "${HOME}/.bash_functions"
 # Load any secrets
 _source_if_exists "${HOME}/.bash_secrets"
 
+# Load local customizations (survives upgrades)
+if [[ -r "${HOME}/.bash_local" ]]; then
+  source "${HOME}/.bash_local"
+  # shellcheck disable=SC2034
+  URDABASH_LOADED_LOCAL=1
+else
+  # shellcheck disable=SC2034
+  URDABASH_LOADED_LOCAL=0
+fi
+
 ################################################################################
 # Tooling
 ################################################################################
 
-# ------------------------------
+# ----------------------------------------
 # 1Password (op)
-# ------------------------------
+# ----------------------------------------
 if [[ -z ${URDABASH_LOADED_1PASSWORD+x} ]]; then
   _op_plugins="${XDG_CONFIG_HOME}/op/plugins.sh"
   if [[ -r "${_op_plugins}" ]]; then
@@ -91,9 +101,9 @@ if [[ -z ${URDABASH_LOADED_1PASSWORD+x} ]]; then
   unset _op_plugins
 fi
 
-# ------------------------------
+# ----------------------------------------
 # direnv
-# ------------------------------
+# ----------------------------------------
 if [[ -z ${URDABASH_LOADED_DIRENV+x} ]]; then
   if command -v direnv >/dev/null 2>&1; then
     readonly URDABASH_LOADED_DIRENV=1
@@ -103,15 +113,28 @@ if [[ -z ${URDABASH_LOADED_DIRENV+x} ]]; then
   fi
 fi
 
-# ------------------------------
-# fnm (via Homebrew or standalone)
-# ------------------------------
+# ----------------------------------------
+# fnm
+# ----------------------------------------
 if [[ -z ${URDABASH_LOADED_FNM+x} ]]; then
   if command -v fnm >/dev/null 2>&1; then
     readonly URDABASH_LOADED_FNM=1
     eval "$(fnm env --use-on-cd --shell bash)"
   else
     readonly URDABASH_LOADED_FNM=0
+  fi
+fi
+
+# ----------------------------------------
+# pnpm
+# ----------------------------------------
+if [[ -z ${URDABASH_LOADED_PNPM+x} ]]; then
+  if command -v pnpm >/dev/null 2>&1; then
+    readonly URDABASH_LOADED_PNPM=1
+    export PNPM_HOME="${XDG_DATA_HOME}/pnpm"
+    _prepend_path_once "${PNPM_HOME}"
+  else
+    readonly URDABASH_LOADED_PNPM=0
   fi
 fi
 
@@ -196,13 +219,13 @@ _set_ps1() {
   local BWhite='\[\e[1;37m\]'
 
   local Color_Off='\[\e[0m\]'
-  local Outline=$BWhite
+  local Outline=${BWhite}
   local TermChar='$'
 
   # Determine if root
   if (( EUID == 0 )); then
     # We ARE root, change prompt details
-    Outline=$BRed
+    Outline=${BRed}
     TermChar='#'
   fi
 
@@ -215,14 +238,14 @@ _set_ps1() {
   unset _PS1_BUF
 }
 
-# Use function for prompts
+# Use function for prompts, save history after each command (crash protection)
 pc=${PROMPT_COMMAND%;}
 case ";${pc};" in
   *";_set_ps1;"*)
     PROMPT_COMMAND="${pc}"
     ;;
   *)
-    PROMPT_COMMAND="${pc:+${pc};}_set_ps1;"
+    PROMPT_COMMAND="history -a;${pc:+${pc};}_set_ps1;"
     ;;
 esac
 

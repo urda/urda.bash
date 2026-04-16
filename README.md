@@ -19,6 +19,7 @@ This is a collection of my bash prompt settings, aliases, exports, and other rel
   - [1Password CLI](https://developer.1password.com/docs/cli/) support.
   - [`direnv`](https://direnv.net/) support.
   - [`fnm`](https://github.com/Schniz/fnm) support.
+  - [`pnpm`](https://pnpm.io/) support.
 - Weekly `VERSION` check against GitHub remote (non-blocking).
   - Also supports on-demand version checking with `_urdabash_version_check now`
 
@@ -27,7 +28,9 @@ Should work with `bash 3.2` or higher.
 ### Aliases
 
 - `clear` - Hard reset the terminal screen.
+- `commitjoke` - Random commit message from `whatthecommit.com`.
 - `cp` - Copy with overwrite confirmation and verbose output.
+- `dadjoke` - Random dad joke from `icanhazdadjoke.com`.
 - `diff` - Unified diff format, with color via `colordiff` when available.
 - `epoch` - Print current unix timestamp (seconds).
 - `get_uuid` - Generate a random UUID.
@@ -38,13 +41,27 @@ Should work with `bash 3.2` or higher.
 - `path` - Print `PATH` entries, one per line.
 - `publicip` - Print public IP address.
 - `serve` - Start a quick HTTP server in the current directory (port 8000).
+- `shrug` - Print the shrug emoticon.
 - `sudo` - Preserves alias expansion when using `sudo`.
+- `tableflip` - Print the table flip emoticon.
+- `tableunflip` - Print the table unflip emoticon.
+- `timestamp` - Print current UTC timestamp in ISO 8601 format.
 - `weather` - Terminal weather forecast via `wttr.in`.
 
 ### Functions
 
+- `bak`
+  - Back up a file with a `.bak` extension.
+- `coinflip`
+  - Flip a coin.
+- `mkcd`
+  - Create a directory and `cd` into it in one step.
 - `psg`
   - Search running processes by name. Filters out the `grep` process itself.
+- `roll`
+  - Roll a die (d6 by default, or specify sides).
+- `tempdir`
+  - Create and `cd` into a disposable temporary directory.
 - `unarc`
   - Extract common archive formats by file extension.
 - `update_brew` *(macOS only)*
@@ -93,6 +110,14 @@ Version check state is stored at `${XDG_STATE_HOME}/urda.bash/` (`~/.local/state
 
 - `last_check` - Timestamp file used to determine when the next fetch is due.
 - `remote_version` - Cached remote version string from the last successful fetch.
+
+### Local Customizations
+
+If `~/.bash_local` exists, it is sourced automatically after all other files. Use this file for machine-specific aliases, functions, or overrides that should survive upgrades.
+
+### Secrets
+
+If `~/.bash_secrets` exists, it is sourced automatically. Use this file for API tokens, credentials, or any other private environment variables.
 
 ## Working with `urda.bash` project files
 

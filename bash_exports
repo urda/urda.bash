@@ -3,6 +3,7 @@
 # ~/.bash_exports: General Exports
 
 # Git Settings
+export GIT_PAGER="less -FRX"
 export GIT_PS1_SHOWDIRTYSTATE=true
 export GIT_PS1_SHOWSTASHSTATE=true
 export GIT_PS1_SHOWUNTRACKEDFILES=true
@@ -14,3 +15,10 @@ export GPG_TTY="$(tty)"
 export HISTCONTROL=ignoreboth
 export HISTFILESIZE=100000
 export HISTSIZE=50000
+export HISTTIMEFORMAT="%F %T  "
+
+# Less
+export LESS="-R"
+
+# SSH Settings
+export SSH_AUTH_SOCK=~/.1password/agent.sock

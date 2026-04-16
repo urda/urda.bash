@@ -1,5 +1,47 @@
 # CHANGELOG
 
+## 2.1.0
+
+This is a general minor release.
+
+- `bashrc`
+  - Added `bash_local` sourcing for local customizations that survive upgrades.
+  - Added `history -a` to `PROMPT_COMMAND` for crash-safe history.
+  - Added `pnpm` tooling block with `URDABASH_LOADED_PNPM` tracking.
+  - Fixed unbraced variables in prompt setup.
+- `bash_aliases`
+  - Added `--max-time 5` to `headers` and `moon` aliases.
+  - Added `commitjoke` alias for random commit messages.
+  - Added `dadjoke` alias for random dad jokes.
+  - Added `shrug` alias.
+  - Added `tableflip` alias.
+  - Added `tableunflip` alias.
+  - Added `timestamp` alias for UTC timestamps.
+- `bash_exports`
+  - Added `GIT_PAGER` to preserve inline display for short git output.
+  - Added `HISTTIMEFORMAT` for timestamps in `history` output.
+  - Added `LESS` with color passthrough enabled.
+- `bash_functions`
+  - Added `bak` function to back up a file with a .bak extension.
+  - Added `coinflip` function.
+  - Added `mkcd` function to create a directory and cd into it.
+  - Added `roll` function to roll dice.
+  - Added `tempdir` function to cd into a disposable temporary directory.
+  - Added tab-completion for `unarc`.
+  - Added `URDABASH_LOADED_LOCAL` to `_urdabash_info`.
+  - Added `URDABASH_LOADED_PNPM` to `_urdabash_info`.
+  - Fixed unbraced variable in `psg`.
+- `bash_linux`
+  - Replaced `~` with `${HOME}` for consistency.
+- `bash_profile`
+  - Replaced `~` with `${HOME}` for consistency.
+- `Makefile`
+  - Added `require-variable-braces` shellcheck rule.
+  - Added SC1091 to shellcheck exclusions.
+- `README.md`
+  - Documented `bash_local` feature.
+  - Documented `bash_secrets` feature.
+
 ## 2.0.0
 
 This major release adds a bootstrap installer and built-in updater.
