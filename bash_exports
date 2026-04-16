@@ -21,4 +21,6 @@ export HISTTIMEFORMAT="%F %T  "
 export LESS="-R"
 
 # SSH Settings
-export SSH_AUTH_SOCK=~/.1password/agent.sock
+if [[ -S "${HOME}/.1password/agent.sock" ]]; then
+  export SSH_AUTH_SOCK="${HOME}/.1password/agent.sock"
+fi

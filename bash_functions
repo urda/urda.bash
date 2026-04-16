@@ -34,7 +34,12 @@ psg() {
 roll() {
   # Roll a die (d6 by default, or specify sides).
   # Usage: roll [sides]
-  echo $(( RANDOM % ${1:-6} + 1 ))
+  local sides=${1:-6}
+  if ! [[ ${sides} =~ ^[0-9]+$ ]] || (( sides < 1 )); then
+    echo "sides must be a positive whole number" >&2
+    return 1
+  fi
+  echo $(( RANDOM % sides + 1 ))
 }
 
 tempdir() {
@@ -69,25 +74,27 @@ unarc() {
   esac
 }
 
-_unarc_completions() {
-  # Tab-completion for unarc: suggest archive files and directories.
-  local cur="${COMP_WORDS[COMP_CWORD]}"
-  local files
-  mapfile -t files < <(compgen -f -- "${cur}")
-  for f in "${files[@]}"; do
-    if [[ -d "${f}" ]]; then
-      COMPREPLY+=( "${f}" )
-    else
-      case "${f}" in
-        *.tar.bz2|*.tbz2|*.tar.gz|*.tgz|*.tar.lzma|*.tar.xz|*.tar| \
-        *.7z|*.bz2|*.gz|*.lzma|*.rar|*.xz|*.Z|*.zip)
-          COMPREPLY+=( "${f}" )
-          ;;
-      esac
-    fi
-  done
-}
-complete -o filenames -F _unarc_completions unarc
+if (( BASH_VERSINFO[0] >= 4 )); then
+  _unarc_completions() {
+    # Tab-completion for unarc: suggest archive files and directories.
+    local cur="${COMP_WORDS[COMP_CWORD]}"
+    local files
+    mapfile -t files < <(compgen -f -- "${cur}")
+    for f in "${files[@]}"; do
+      if [[ -d "${f}" ]]; then
+        COMPREPLY+=( "${f}" )
+      else
+        case "${f}" in
+          *.tar.bz2|*.tbz2|*.tar.gz|*.tgz|*.tar.lzma|*.tar.xz|*.tar| \
+          *.7z|*.bz2|*.gz|*.lzma|*.rar|*.xz|*.Z|*.zip)
+            COMPREPLY+=( "${f}" )
+            ;;
+        esac
+      fi
+    done
+  }
+  complete -o filenames -F _unarc_completions unarc
+fi
 
 ################################################################################
 # Internal Functions

@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 2.1.2
+
+This is a bugfix release.
+
+- `bash_exports`
+  - Fixed `SSH_AUTH_SOCK` to only apply when the 1Password SSH agent socket is present.
+- `bash_functions`
+  - Fixed `roll` to reject non-integer and non-positive values.
+  - Fixed `_unarc_completions` to skip registration on bash older than 4.0.
+
 ## 2.1.1
 
 This is a bugfix release.
