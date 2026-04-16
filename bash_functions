@@ -323,7 +323,7 @@ _urdabash_update() {
   # Copy files to home directory
   while IFS= read -r file; do
     [[ -z ${file} ]] && continue
-    cp -v "${cache_dir}/${file}" "${HOME}/.${file}"
+    command cp -v "${cache_dir}/${file}" "${HOME}/.${file}"
   done <<< "${remote_manifest}"
 
   # Cleanup and report

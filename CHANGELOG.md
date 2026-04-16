@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 2.1.1
+
+This is a bugfix release.
+
+- `bash_functions`
+  - Fixed `_urdabash_update` incorrectly triggering the `cp` alias during file installation.
+
 ## 2.1.0
 
 This is a general minor release.

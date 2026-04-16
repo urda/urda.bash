@@ -20,7 +20,7 @@ bind 'set mark-symlinked-directories on' 2>/dev/null
 ################################################################################
 
 if [[ -z ${URDABASH_VERSION+x} ]]; then
-  readonly URDABASH_VERSION="2.1.0"
+  readonly URDABASH_VERSION="2.1.1"
   export URDABASH_VERSION
 fi
 
