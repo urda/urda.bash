@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 2.1.3
+
+This is a bugfix release.
+
+- `bash_aliases`
+  - Fixed `commitjoke` to print a trailing newline.
+
 ## 2.1.2
 
 This is a bugfix release.

@@ -6,7 +6,7 @@
 alias clear='printf "\033c"'
 
 # random commit message from whatthecommit.com
-alias commitjoke='curl -sL --max-time 5 https://whatthecommit.com/index.txt'
+alias commitjoke='curl -sL --max-time 5 https://whatthecommit.com/index.txt && echo'
 
 # copy with confirmation and feedback
 alias cp='cp -iv'
