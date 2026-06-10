@@ -47,7 +47,7 @@ if [ -x /opt/homebrew/bin/brew ] && [[ -z ${URDABASH_LOADED_HOMEBREW+x} ]]; then
     normal=$(tput sgr0 2>/dev/null || printf '')
     brew --version &&
     echo "${bold} > brew update${normal}" && brew update &&
-    echo "${bold} > brew upgrade${normal}" && brew upgrade &&
+    echo "${bold} > brew upgrade${normal}" && brew upgrade --yes &&
     echo "${bold} > brew autoremove${normal}" && brew autoremove &&
     echo "${bold} > brew cleanup${normal}" && brew cleanup &&
     echo "${bold} > brew doctor${normal}" && brew doctor;
