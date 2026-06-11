@@ -6,6 +6,8 @@ This is a bugfix release.
 
 - `bash_aliases`
   - Fixed `commitjoke` to print a trailing newline.
+- `bash_osx`
+  - Fixed `update_brew` to pass `--yes` to `brew upgrade`, required by newer Homebrew.
 
 ## 2.1.2
 
