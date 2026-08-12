@@ -20,7 +20,7 @@ bind 'set mark-symlinked-directories on' 2>/dev/null
 ################################################################################
 
 if [[ -z ${URDABASH_VERSION+x} ]]; then
-  readonly URDABASH_VERSION="2.1.3"
+  readonly URDABASH_VERSION="2.2.0"
   export URDABASH_VERSION
 fi
 
@@ -30,14 +30,28 @@ if [[ -z ${URDABASH_VERSION_URL+x} ]]; then
 fi
 
 if [[ -z ${URDABASH_OS+x} ]]; then
-  readonly URDABASH_OS="$(uname -s)"
+  URDABASH_OS="$(uname -s)"
+  readonly URDABASH_OS
   export URDABASH_OS
 fi
 
-export XDG_CONFIG_HOME="${HOME}/.config"
-export XDG_CACHE_HOME="${HOME}/.cache"
-export XDG_DATA_HOME="${HOME}/.local/share"
-export XDG_STATE_HOME="${HOME}/.local/state"
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-${HOME}/.config}"
+export XDG_CACHE_HOME="${XDG_CACHE_HOME:-${HOME}/.cache}"
+export XDG_DATA_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}"
+export XDG_STATE_HOME="${XDG_STATE_HOME:-${HOME}/.local/state}"
+
+_prepend_path_once() {
+  # Prepend a directory to PATH if it exists and is not already present.
+  # Usage: _prepend_path_once <directory>
+  local dir=${1}
+  [[ -d ${dir} ]] || return
+  case ":${PATH}:" in
+    # Already present
+    *":${dir}:"*) ;;
+    # Prepend once
+    *) PATH="${dir}:${PATH}" ;;
+  esac
+}
 
 _source_if_exists() {
   # Source a file if it exists and is readable, skip otherwise.
@@ -69,6 +83,17 @@ _source_if_exists "${HOME}/.bash_aliases"
 
 # Load common function definitions
 _source_if_exists "${HOME}/.bash_functions"
+
+# Load extensions from the drop-in directory (sorted, *.sh only)
+# shellcheck disable=SC2034
+URDABASH_LOADED_EXTENSIONS=0
+for _ext in "${XDG_CONFIG_HOME}/urda.bash/extensions.d"/*.sh; do
+  [[ -r "${_ext}" ]] || continue
+  # shellcheck source=/dev/null
+  source "${_ext}"
+  (( URDABASH_LOADED_EXTENSIONS++ ))
+done
+unset _ext
 
 # Load any secrets
 _source_if_exists "${HOME}/.bash_secrets"
@@ -132,7 +157,7 @@ if [[ -z ${URDABASH_LOADED_PNPM+x} ]]; then
   if command -v pnpm >/dev/null 2>&1; then
     readonly URDABASH_LOADED_PNPM=1
     export PNPM_HOME="${XDG_DATA_HOME}/pnpm"
-    _prepend_path_once "${PNPM_HOME}"
+    _prepend_path_once "${PNPM_HOME}/bin"
   else
     readonly URDABASH_LOADED_PNPM=0
   fi
@@ -142,7 +167,7 @@ fi
 # Update Check
 ################################################################################
 
-_urdabash_version_check
+type -t _urdabash_version_check >/dev/null && _urdabash_version_check
 
 ################################################################################
 # Prompt Functions
@@ -167,6 +192,9 @@ _ps1_header_line() {
 _ps1_git_line() {
   # Render the git prompt line: ╠═[git : branch_name]
   # Walks up the directory tree to detect .git before forking for __git_ps1.
+  # This value must remain global because PS1 expands it after this function returns.
+  _URDABASH_PS1_GIT_TEXT=""
+
   local _dir="${PWD}"
   while [[ "${_dir}" != "/" ]]; do
     [[ -e "${_dir}/.git" ]] && break
@@ -176,13 +204,18 @@ _ps1_git_line() {
   [[ "${_dir}" != "/" ]] || return 0
 
   type __git_ps1 >/dev/null 2>&1 || return 0
-  local branch
-  branch=$(__git_ps1 "%s") || branch=""
-  [[ -n "${branch}" ]] || return 0
+  _URDABASH_PS1_GIT_TEXT=$(__git_ps1 "%s") || _URDABASH_PS1_GIT_TEXT=""
+  [[ -n "${_URDABASH_PS1_GIT_TEXT}" ]] || return 0
+  local git_text="${_URDABASH_PS1_GIT_TEXT}"
+  if shopt -q promptvars; then
+    # Defer expansion so branch contents are not parsed as PS1 source.
+    # shellcheck disable=SC2016
+    git_text='${_URDABASH_PS1_GIT_TEXT}'
+  fi
   local outline=${1} green=${2} blue=${3} reset=${4}
   local _line
   printf -v _line '%s%s%s[%sgit%s %s: %s%s%s]%s\\n' \
-    "${outline}" $'\xE2\x95\xa0' $'\xE2\x95\x90' "${green}" "${reset}" "${outline}" "${blue}" "${branch}" "${outline}" "${reset}"
+    "${outline}" $'\xE2\x95\xa0' $'\xE2\x95\x90' "${green}" "${reset}" "${outline}" "${blue}" "${git_text}" "${outline}" "${reset}"
   _PS1_BUF+=${_line}
 }
 
@@ -190,10 +223,16 @@ _ps1_screen_line() {
   # Render the screen prompt line: ╠═[screen : session_name]
   # Only shown when inside a GNU screen session (STY is set).
   [[ -n "${STY}" ]] || return 0
+  local screen_text="${STY}"
+  if shopt -q promptvars; then
+    # Defer expansion so session contents are not parsed as PS1 source.
+    # shellcheck disable=SC2016
+    screen_text='${STY}'
+  fi
   local outline=${1} green=${2} blue=${3} reset=${4}
   local _line
   printf -v _line '%s%s%s[%sscreen%s %s: %s%s%s]%s\\n' \
-    "${outline}" $'\xE2\x95\xa0' $'\xE2\x95\x90' "${green}" "${reset}" "${outline}" "${blue}" "${STY}" "${outline}" "${reset}"
+    "${outline}" $'\xE2\x95\xa0' $'\xE2\x95\x90' "${green}" "${reset}" "${outline}" "${blue}" "${screen_text}" "${outline}" "${reset}"
   _PS1_BUF+=${_line}
 }
 
@@ -248,6 +287,7 @@ case ";${pc};" in
     PROMPT_COMMAND="history -a;${pc:+${pc};}_set_ps1;"
     ;;
 esac
+unset pc
 
 ################################################################################
 # Priority PATH Overrides

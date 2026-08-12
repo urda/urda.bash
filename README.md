@@ -22,6 +22,7 @@ This is a collection of my bash prompt settings, aliases, exports, and other rel
   - [`pnpm`](https://pnpm.io/) support.
 - Weekly `VERSION` check against GitHub remote (non-blocking).
   - Also supports on-demand version checking with `_urdabash_version_check now`
+- Extension drop-in directory (`~/.config/urda.bash/extensions.d/`).
 
 Should work with `bash 3.2` or higher.
 
@@ -33,7 +34,6 @@ Should work with `bash 3.2` or higher.
 - `dadjoke` - Random dad joke from `icanhazdadjoke.com`.
 - `diff` - Unified diff format, with color via `colordiff` when available.
 - `epoch` - Print current unix timestamp (seconds).
-- `get_uuid` - Generate a random UUID.
 - `headers` - Fetch HTTP response headers only.
 - `ll` - Long listing format (`ls -hlF`).
 - `moon` - Current moon phase via `wttr.in`.
@@ -54,6 +54,8 @@ Should work with `bash 3.2` or higher.
   - Back up a file with a `.bak` extension.
 - `coinflip`
   - Flip a coin.
+- `get_uuid`
+  - Generate a random lowercase UUID (`uuidgen`, Linux kernel, or `python3`, whichever is present).
 - `mkcd`
   - Create a directory and `cd` into it in one step.
 - `psg`
@@ -111,6 +113,27 @@ Version check state is stored at `${XDG_STATE_HOME}/urda.bash/` (`~/.local/state
 - `last_check` - Timestamp file used to determine when the next fetch is due.
 - `remote_version` - Cached remote version string from the last successful fetch.
 
+### Extensions
+
+Drop `*.sh` files into `${XDG_CONFIG_HOME}/urda.bash/extensions.d/`
+(`~/.config/urda.bash/extensions.d/`) and they are sourced automatically at
+shell startup, in sorted order, after the core urda.bash files and before
+`bash_secrets` and `bash_local`. Use `NN-` prefixes to control load order:
+
+```text
+10-bw-session.sh
+20-work-tools.sh
+```
+
+The directory is optional and never touched by the updater. `_urdabash_info`
+reports how many extensions loaded via `URDABASH_LOADED_EXTENSIONS`.
+
+#### A Word on Trust
+
+Sourcing an extension is running shell code in every interactive shell, with
+everything your user can do. Only place files you trust in this directory,
+and inspect anything you did not write yourself before your next shell starts.
+
 ### Local Customizations
 
 If `~/.bash_local` exists, it is sourced automatically after all other files. Use this file for machine-specific aliases, functions, or overrides that should survive upgrades.
@@ -141,6 +164,20 @@ This will also run a `make version-check`.
 make test
 ```
 
+### Smoke test
+
+Boot the managed files in a clean interactive shell against a temporary `HOME`:
+
+```bash
+make smoke
+```
+
+Set `SMOKE_BASH` to select the shell under test:
+
+```bash
+make smoke SMOKE_BASH=/bin/bash
+```
+
 ### Copying files to your `${HOME}`
 
 **WARNING!** This is a **DESTRUCTIVE** operation and copies `bash` files from the project into your `${HOME}`.
@@ -152,3 +189,13 @@ make copy
 ### Project version check
 
 Just run `make version-check`.
+
+### Release checks
+
+Before cutting a release, run the documentation parity checks:
+
+```bash
+make release-check
+```
+
+This verifies that every alias and function agrees across the code, the `_urdabash_help` screen, and this README, that each list is alphabetized, and runs the version and MANIFEST checks.

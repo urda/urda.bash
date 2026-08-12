@@ -1,5 +1,46 @@
 # CHANGELOG
 
+## 2.2.0
+
+This is an enhancement, housekeeping, and bugfix release.
+
+- `bashrc`
+  - Added extension drop-in loading: `*.sh` files in `~/.config/urda.bash/extensions.d/` are sourced in sorted order after core files and before `bash_secrets`.
+  - Added `URDABASH_LOADED_EXTENSIONS` count of loaded extensions.
+  - Moved `_prepend_path_once` in from `bash_functions` so PATH setup no longer depends on another file loading.
+  - Guarded the startup version check so a partial install fails quietly.
+  - Fixed the git and screen prompt lines to treat branch and session names as data, closing a command injection path through prompt expansion.
+  - Fixed XDG variables to respect values already set by the environment.
+  - Fixed a stray `pc` variable leaking into every shell.
+  - Fixed the `pnpm` PATH entry to use `${PNPM_HOME}/bin`, where pnpm v11 stores global binaries.
+- `bash_aliases`
+  - Removed `get_uuid` alias (now a function, see `bash_functions`).
+- `bash_exports`
+  - Fixed `GPG_TTY` to declare and export separately.
+- `bash_functions`
+  - Added `get_uuid` function with fallbacks: `uuidgen`, the Linux kernel, then `python3`. Output is lowercase on all platforms.
+  - Added input validation to `bak`.
+  - Added `URDABASH_LOADED_EXTENSIONS` to `_urdabash_info`.
+  - Fixed `psg` to treat multiple words as a single search pattern.
+  - Fixed `unarc` to return an error on unknown archive types and print errors to stderr.
+  - Moved `_prepend_path_once` to `bashrc`.
+  - Reordered `_urdabash_update` before `_urdabash_version_check` to restore alphabetical order.
+- `Makefile`
+  - Added `release-check` target for documentation parity checks.
+  - Added `smoke` target that boots bashrc in a clean shell against a temp HOME, including extension loader checks; `SMOKE_BASH` selects the shell under test.
+  - Added `install.sh` and `release_check.sh` to shellcheck coverage.
+  - Removed the SC2155 shellcheck exclusion.
+  - Switched variable references to braced style.
+- `README.md`
+  - Documented the Extensions drop-in directory, including a trust warning.
+  - Documented the `release-check` and smoke targets.
+  - Updated `get_uuid` documentation (alias to function).
+- `release_check.sh`
+  - New script verifying aliases and functions agree across the code, the help screen, and the README, and that all lists stay alphabetized.
+- `.github/workflows/testing.yaml`
+  - Added the smoke test to the Ubuntu job.
+  - Added a macOS job running the smoke test under `/bin/bash` 3.2.
+
 ## 2.1.3
 
 This is a bugfix release.

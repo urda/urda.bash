@@ -24,9 +24,6 @@ fi
 # current unix epoch in seconds
 alias epoch='date +%s'
 
-# get a UUID on demand
-alias get_uuid='python3 -c "import uuid;print(uuid.uuid4())"'
-
 # fetch HTTP response headers only
 alias headers='curl -sI --max-time 5'
 
